@@ -1,9 +1,12 @@
 import { NestiaSwaggerComposer } from '@nestia/sdk';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import { AppModule } from './app.module';
 import { ConfigService } from './libs/config/config.service';
+import { GlobalExceptionFilter } from './utils/exception';
 
 const logger = new Logger('Bootstrap');
 
@@ -48,41 +51,57 @@ const setupSwagger = async (app: INestApplication, config: ConfigService) => {
     },
     customSiteTitle: 'MRCS Mock Exam Backend',
   });
-};
 
-const setupCors = (app: INestApplication) => {
-  app.enableCors({
-    origin: true, // Allow all origins for now
-    credentials: true,
-  });
+  return document;
 };
 
 const bootstrap = async (): Promise<void> => {
   try {
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
 
-    const config = app.get(ConfigService);
+    const validationPipe = new ValidationPipe({
+      whitelist: true,
+      stopAtFirstError: true,
+      transform: true,
+    });
 
-    // Setup CORS
-    setupCors(app);
+    app.useGlobalPipes(validationPipe);
+
+    app.useGlobalFilters(new GlobalExceptionFilter());
+
+    const appConfig = app.get(ConfigService);
+
+    app.useBodyParser('json', { limit: '50mb' });
+    app.setGlobalPrefix('api');
+
+    // app.enableVersioning({ type: VersioningType.URI });
+    app.enableCors({ origin: true });
 
     // Setup Swagger
-    await setupSwagger(app, config);
+    const doc = await setupSwagger(app, appConfig);
 
-    // Start the application
-    await app.listen(config.port, '0.0.0.0');
+    app.use('/api/reference/json', (_: Request, res: Response) => {
+      res.json(doc);
+    });
 
-    logger.log(`🚀 Application is running on: http://localhost:${config.port}`);
+    await app.listen(appConfig.port);
+
     logger.log(
-      `📚 Swagger documentation available at: http://localhost:${config.port}/api`,
+      `🚀 Application is running on: http://localhost:${appConfig.port}`,
     );
-    logger.log(`🌍 Environment: ${config.nodeEnv}`);
+    logger.log(
+      `📚 Swagger documentation available at: http://localhost:${appConfig.port}/api`,
+    );
+    logger.log(`🌍 Environment: ${appConfig.nodeEnv}`);
   } catch (error) {
     logger.error('Error starting application:', error);
     process.exit(1);
   }
 };
 
-bootstrap().then();
+bootstrap().catch((err) => {
+  logger.error('Error starting application:', err);
+  process.exit(1);
+});

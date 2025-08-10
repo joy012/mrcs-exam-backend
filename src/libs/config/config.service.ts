@@ -157,7 +157,6 @@ export class ConfigService {
   get adminPassword(): string {
     return this.admin.password;
   }
-
   get bcryptRounds(): number {
     return this.security.bcryptRounds;
   }

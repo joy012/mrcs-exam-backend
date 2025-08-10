@@ -1,0 +1,440 @@
+{
+  "openapi": "3.1.0",
+  "servers": [],
+  "info": {
+    "title": "MRCS Exam Backend",
+    "description": "MRCS Exam API",
+    "version": "1.0.0",
+    "license": {
+      "name": "UNLICENSED"
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "getHello"
+        ],
+        "x-samchon-controller": "AppController"
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthSignupDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSignupResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "signup"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthLoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "login"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthVerifyEmailDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "verify_email",
+          "verifyEmail"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthSendForgotPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "forgot_password",
+          "forgotPassword"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthResetPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "reset_password",
+          "resetPassword"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthSignupResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Created user ID"
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "AuthSignupDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last name"
+          },
+          "role": {
+            "oneOf": [
+              {
+                "const": "admin"
+              },
+              {
+                "const": "student"
+              }
+            ],
+            "description": "Role, defaults to student"
+          },
+          "medicalCollegeName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Medical college name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9]{7,15}$",
+            "description": "E.164-ish phone, 7-15 digits, optional leading +"
+          },
+          "mmbsPassingYear": {
+            "type": "number",
+            "minimum": 1950,
+            "maximum": 2100,
+            "description": "MBBS passing year"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Password (min 8 chars)"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "medicalCollegeName",
+          "email",
+          "password"
+        ]
+      },
+      "AuthLoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthLoginResponseUser"
+          }
+        },
+        "required": [
+          "accessToken",
+          "user"
+        ]
+      },
+      "AuthLoginResponseUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "oneOf": [
+              {
+                "const": "admin"
+              },
+              {
+                "const": "student"
+              }
+            ]
+          },
+          "isEmailVerified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "role",
+          "isEmailVerified"
+        ]
+      },
+      "AuthLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "EmptyResponse": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "AuthVerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 16,
+            "description": "Verification token"
+          }
+        },
+        "required": [
+          "email",
+          "token"
+        ]
+      },
+      "AuthSendForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 16,
+            "description": "Reset token"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "description": "New password"
+          }
+        },
+        "required": [
+          "email",
+          "token",
+          "newPassword"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth"
+    }
+  ],
+  "x-samchon-emended-v4": true
+}
