@@ -27,7 +27,9 @@ class SmtpConfig {
   host: string;
 
   @Env('SMTP_PORT')
-  @Transform(({ value }) => parseInt(value || '587', 10))
+  @Transform(({ value }: { value?: string }) =>
+    parseInt(value && value.length ? value : '587', 10),
+  )
   port = 587;
 
   @Env('SMTP_USER')
@@ -47,7 +49,9 @@ class AdminConfig {
 
 class ServerConfig {
   @Env('PORT')
-  @Transform(({ value }) => parseInt(value || '3001', 10))
+  @Transform(({ value }: { value?: string }) =>
+    parseInt(value && value.length ? value : '3001', 10),
+  )
   port = 3001;
 
   @Env('NODE_ENV')
@@ -59,8 +63,21 @@ class ServerConfig {
 
 class SecurityConfig {
   @Env('BCRYPT_ROUNDS')
-  @Transform(({ value }) => parseInt(value || '12', 10))
+  @Transform(({ value }: { value?: string }) =>
+    parseInt(value && value.length ? value : '12', 10),
+  )
   bcryptRounds = 12;
+}
+
+class BrandConfig {
+  @Env('BRAND_NAME')
+  name = 'MRCS Practice Exam';
+
+  @Env('BRAND_PRIMARY_COLOR')
+  primaryColor = '#635bff';
+
+  @Env('BRAND_LOGO_URL')
+  logoUrl = '';
 }
 
 export class ConfigService {
@@ -84,6 +101,9 @@ export class ConfigService {
 
   @Section(() => SecurityConfig)
   security: SecurityConfig;
+
+  @Section(() => BrandConfig)
+  brand: BrandConfig;
 
   // Convenience getters for backward compatibility
   get port(): number {
@@ -158,6 +178,18 @@ export class ConfigService {
     return this.smtp.pass;
   }
 
+  get brandName(): string {
+    return this.brand.name;
+  }
+
+  get brandPrimaryColor(): string {
+    return this.brand.primaryColor;
+  }
+
+  get brandLogoUrl(): string {
+    return this.brand.logoUrl;
+  }
+
   // Get all configuration as a single object
   getAll() {
     return {
@@ -168,6 +200,7 @@ export class ConfigService {
       smtp: this.smtp,
       admin: this.admin,
       security: this.security,
+      brand: this.brand,
     };
   }
 }

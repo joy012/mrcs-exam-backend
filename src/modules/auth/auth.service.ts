@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   async verifyEmail(payload: AuthVerifyEmailDto): Promise<void> {
-    let decoded: any;
+    let decoded: { email: string; purpose: 'verify' | 'reset' };
     try {
       decoded = this.jwt.verify(payload.token, {
         secret: this.config.jwtSecret,
@@ -119,10 +119,22 @@ export class AuthService {
     if (decoded.email !== payload.email || decoded.purpose !== 'verify') {
       throw new BadRequestException('Invalid token');
     }
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { email: payload.email },
       data: { isEmailVerified: true },
     });
+
+    // Send welcome email after successful verification (best-effort)
+    try {
+      const html = this.emailService.buildWelcomeTemplate(user.firstName);
+      await this.emailService.sendEmail({
+        to: user.email,
+        subject: 'Welcome to our platform',
+        html,
+      });
+    } catch (err) {
+      // Log and continue without failing the verification endpoint
+    }
   }
 
   async sendForgotPassword(payload: AuthSendForgotPasswordDto): Promise<void> {
@@ -143,7 +155,7 @@ export class AuthService {
   }
 
   async resetPassword(payload: AuthResetPasswordDto): Promise<void> {
-    let decoded: any;
+    let decoded: { email: string; purpose: 'verify' | 'reset' };
     try {
       decoded = this.jwt.verify(payload.token, {
         secret: this.config.jwtSecret,

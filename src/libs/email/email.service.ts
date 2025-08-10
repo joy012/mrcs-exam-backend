@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import nodemailer, { Transporter } from 'nodemailer';
 import { ConfigService } from '../config/config.service';
+import { templates } from './emailTemplates';
+import type { TemplateParams } from './emailTemplates/types';
 
 @Injectable()
 export class EmailService {
@@ -31,31 +33,31 @@ export class EmailService {
     await transporter.sendMail({ from, ...options });
   }
 
+  renderTemplate(key: string, variables: Record<string, unknown>): string {
+    const template = templates[key];
+    if (!template) {
+      this.logger.warn(`Email template not found: ${key}`);
+      return '';
+    }
+    const params: TemplateParams = {
+      brandName: this.config.brandName,
+      brandPrimaryColor: this.config.brandPrimaryColor,
+      brandLogoUrl: this.config.brandLogoUrl,
+      frontendUrl: this.config.frontendUrl,
+      ...variables,
+    } as TemplateParams;
+    return template(params);
+  }
+
   buildVerifyEmailTemplate(email: string, token: string): string {
-    const url = `${this.config.frontendUrl.replace(/\/$/, '')}/verify-email?email=${encodeURIComponent(
-      email,
-    )}&token=${encodeURIComponent(token)}`;
-    return `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Verify your email</h2>
-        <p>Thanks for signing up. Please verify your email address by clicking the button below:</p>
-        <p><a href="${url}" style="background:#1a73e8;color:#fff;padding:12px 20px;text-decoration:none;border-radius:6px;display:inline-block">Verify Email</a></p>
-        <p>If the button does not work, use this link: <a href="${url}">${url}</a></p>
-      </div>
-    `;
+    return this.renderTemplate('verify-email', { email, token });
   }
 
   buildResetPasswordTemplate(email: string, token: string): string {
-    const url = `${this.config.frontendUrl.replace(/\/$/, '')}/reset-password?email=${encodeURIComponent(
-      email,
-    )}&token=${encodeURIComponent(token)}`;
-    return `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Reset your password</h2>
-        <p>We received a request to reset your password. Click the button below to choose a new password:</p>
-        <p><a href="${url}" style="background:#1a73e8;color:#fff;padding:12px 20px;text-decoration:none;border-radius:6px;display:inline-block">Reset Password</a></p>
-        <p>If the button does not work, use this link: <a href="${url}">${url}</a></p>
-      </div>
-    `;
+    return this.renderTemplate('reset-password', { email, token });
+  }
+
+  buildWelcomeTemplate(firstName?: string): string {
+    return this.renderTemplate('welcome', { firstName: firstName ?? '' });
   }
 }
