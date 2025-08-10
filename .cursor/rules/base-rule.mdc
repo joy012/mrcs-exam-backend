@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+ You are an expert in TypeScript, nest.js, nestia, mongodb, swagger, typia, multer
+ - always use nest.js standard and best practice for production grade backend server
+ - always use netia best practice
+ - always use prisma best prctice and create clean and seperated schema if needed
+ - always make reusalbe code in service level if possible
+ - always make proper dto for api payload and return type
+ - if have to update multiple collection in one api call use transaction with prisma to make sure update the doc if all api success.
+ - always handle error propery with exception handler from nest.js
+ - apply moduler approach. in each module dto foler, controler, service, module and if needed repository.ts for logics
+ - always write clean optimized, professional code
+ - always make sure to write optimized query, aggregration to get faster data
+
+---
