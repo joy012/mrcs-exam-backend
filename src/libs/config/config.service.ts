@@ -71,7 +71,7 @@ class SecurityConfig {
 
 class BrandConfig {
   @Env('BRAND_NAME')
-  name = 'MRCS Practice Exam';
+  name = 'Zero To MRCS';
 
   @Env('BRAND_PRIMARY_COLOR')
   primaryColor = '#635bff';

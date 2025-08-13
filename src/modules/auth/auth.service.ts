@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -39,7 +40,7 @@ export class AuthService {
   }): string {
     return this.jwt.sign(payload, {
       secret: this.config.jwtSecret,
-      expiresIn: payload.purpose === 'verify' ? '1d' : '30m',
+      expiresIn: '1h',
     });
   }
 
@@ -113,24 +114,24 @@ export class AuthService {
         secret: this.config.jwtSecret,
       });
     } catch {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Invalid verification token');
     }
     if (decoded.email !== payload.email || decoded.purpose !== 'verify') {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Invalid verification token or user email');
     }
     const user = await this.prisma.user.update({
       where: { email: payload.email },
       data: { isEmailVerified: true },
     });
 
-    // Send welcome email after successful verification (best-effort)
     try {
       await this.emailService.sendTemplate('welcome-email', {
         to: user.email,
-        firstName: user.firstName ?? undefined,
+        firstName: user.firstName,
       });
     } catch (err) {
-      // Log and continue without failing the verification endpoint
+      //Log and continue without failing the verification endpoint
+      console.log({ err });
     }
   }
 
@@ -138,7 +139,9 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
-    if (!user) return; // do not reveal existence
+    if (!user) {
+      throw new NotFoundException('User with this email does not exist');
+    }
     const token = this.signEmailToken({ email: user.email, purpose: 'reset' });
     await this.emailService.sendTemplate('forget-pass-email', {
       to: user.email,
@@ -154,15 +157,11 @@ export class AuthService {
         secret: this.config.jwtSecret,
       });
     } catch {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Invalid reset password token');
     }
     if (decoded.email !== payload.email || decoded.purpose !== 'reset') {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Invalid user email or token');
     }
     const passwordHash = await this.hashPassword(payload.newPassword);
-    await this.prisma.user.update({
-      where: { email: payload.email },
-      data: { password: passwordHash },
-    });
   }
 }

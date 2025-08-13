@@ -48,7 +48,6 @@ export class EmailService {
 
     const branding = {
       brandName: this.config.brandName,
-      brandPrimaryColor: this.config.brandPrimaryColor,
       brandLogoUrl: this.config.brandLogoUrl,
       frontendUrl: this.config.frontendUrl,
     } as const;
