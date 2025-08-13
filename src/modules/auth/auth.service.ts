@@ -70,11 +70,10 @@ export class AuthService {
     });
 
     const token = this.signEmailToken({ email: user.email, purpose: 'verify' });
-    const html = this.emailService.buildVerifyEmailTemplate(user.email, token);
-    await this.emailService.sendEmail({
+    await this.emailService.sendTemplate('verify-email', {
       to: user.email,
-      subject: 'Verify your email',
-      html,
+      email: user.email,
+      token,
     });
 
     return { userId: user.id };
@@ -126,11 +125,9 @@ export class AuthService {
 
     // Send welcome email after successful verification (best-effort)
     try {
-      const html = this.emailService.buildWelcomeTemplate(user.firstName);
-      await this.emailService.sendEmail({
+      await this.emailService.sendTemplate('welcome-email', {
         to: user.email,
-        subject: 'Welcome to our platform',
-        html,
+        firstName: user.firstName ?? undefined,
       });
     } catch (err) {
       // Log and continue without failing the verification endpoint
@@ -143,14 +140,10 @@ export class AuthService {
     });
     if (!user) return; // do not reveal existence
     const token = this.signEmailToken({ email: user.email, purpose: 'reset' });
-    const html = this.emailService.buildResetPasswordTemplate(
-      user.email,
-      token,
-    );
-    await this.emailService.sendEmail({
+    await this.emailService.sendTemplate('forget-pass-email', {
       to: user.email,
-      subject: 'Reset your password',
-      html,
+      email: user.email,
+      token,
     });
   }
 
