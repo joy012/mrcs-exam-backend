@@ -85,8 +85,11 @@ export class AuthService {
       where: { email: payload.email },
     });
     if (!user) throw new UnauthorizedException('Invalid credentials');
-    const ok = await bcrypt.compare(payload.password, user.password);
-    if (!ok) throw new UnauthorizedException('Invalid credentials');
+
+    const passMatched = await bcrypt.compare(payload.password, user.password);
+
+    if (!passMatched) throw new UnauthorizedException('Invalid credentials');
+
     const accessToken = this.jwt.sign(
       { sub: user.id, role: user.role },
       {
@@ -107,7 +110,7 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(payload: AuthVerifyEmailDto): Promise<void> {
+  async verifyEmail(payload: AuthVerifyEmailDto): Promise<string> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
     try {
       decoded = this.jwt.verify(payload.token, {
@@ -133,9 +136,13 @@ export class AuthService {
       //Log and continue without failing the verification endpoint
       console.log({ err });
     }
+
+    return 'Email verified successfully';
   }
 
-  async sendForgotPassword(payload: AuthSendForgotPasswordDto): Promise<void> {
+  async sendForgotPassword(
+    payload: AuthSendForgotPasswordDto,
+  ): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
@@ -148,9 +155,11 @@ export class AuthService {
       email: user.email,
       token,
     });
+
+    return 'Recovery password email sent successfully';
   }
 
-  async resetPassword(payload: AuthResetPasswordDto): Promise<void> {
+  async resetPassword(payload: AuthResetPasswordDto): Promise<string> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
     try {
       decoded = this.jwt.verify(payload.token, {
@@ -159,9 +168,38 @@ export class AuthService {
     } catch {
       throw new BadRequestException('Invalid reset password token');
     }
+
     if (decoded.email !== payload.email || decoded.purpose !== 'reset') {
       throw new BadRequestException('Invalid user email or token');
     }
+
     const passwordHash = await this.hashPassword(payload.newPassword);
+
+    await this.prisma.user.update({
+      where: { email: payload.email },
+      data: { password: passwordHash },
+    });
+
+    return 'Password reset successful';
+  }
+
+  async refreshToken(refreshToken: string): Promise<string> {
+    const { id, type } = await this.jwt.verifyAsync<{
+      id: string;
+      type: 'refresh_token';
+    }>(refreshToken);
+
+    if (type !== 'refresh_token')
+      throw new BadRequestException('Invalid refresh token');
+
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const accessToken = await this.jwt.signAsync(
+      { id: user.id, type: 'access_token' },
+      { expiresIn: this.config.jwtAccessTokenExpiresIn },
+    );
+
+    return accessToken;
   }
 }

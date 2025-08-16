@@ -53,3 +53,7 @@ export interface AuthResetPasswordDto {
   /** New password */
   newPassword: string & tags.MinLength<8>;
 }
+
+export interface RefreshTokenBody {
+  refreshToken: string;
+}

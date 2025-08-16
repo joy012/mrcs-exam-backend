@@ -10,7 +10,7 @@ import {
   AuthSignupDto,
   AuthSignupResponse,
   AuthVerifyEmailDto,
-  EmptyResponse,
+  RefreshTokenBody,
 } from './dto';
 
 @ApiTags('Auth')
@@ -29,26 +29,26 @@ export class AuthController {
   }
 
   @TypedRoute.Post('verify-email')
-  async verifyEmail(
-    @TypedBody() body: AuthVerifyEmailDto,
-  ): Promise<EmptyResponse> {
-    await this.authService.verifyEmail(body);
-    return {};
+  async verifyEmail(@TypedBody() body: AuthVerifyEmailDto): Promise<string> {
+    return await this.authService.verifyEmail(body);
   }
 
   @TypedRoute.Post('forgot-password')
   async forgotPassword(
     @TypedBody() body: AuthSendForgotPasswordDto,
-  ): Promise<EmptyResponse> {
-    await this.authService.sendForgotPassword(body);
-    return {};
+  ): Promise<string> {
+    return await this.authService.sendForgotPassword(body);
   }
 
   @TypedRoute.Post('reset-password')
   async resetPassword(
     @TypedBody() body: AuthResetPasswordDto,
-  ): Promise<EmptyResponse> {
-    await this.authService.resetPassword(body);
-    return {};
+  ): Promise<string> {
+    return await this.authService.resetPassword(body);
+  }
+
+  @TypedRoute.Post('refresh')
+  async refresh(@TypedBody() body: RefreshTokenBody): Promise<string> {
+    return await this.authService.refreshToken(body.refreshToken);
   }
 }
