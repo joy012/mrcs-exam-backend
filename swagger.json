@@ -244,6 +244,76 @@
         ],
         "x-samchon-controller": "AuthController"
       }
+    },
+    "/user/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "me",
+          "getMe"
+        ],
+        "x-samchon-controller": "UserController"
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "me",
+          "updateMe"
+        ],
+        "x-samchon-controller": "UserController"
+      }
     }
   },
   "components": {
@@ -462,6 +532,98 @@
         "required": [
           "refreshToken"
         ]
+      },
+      "UserMeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "oneOf": [
+              {
+                "const": "admin"
+              },
+              {
+                "const": "student"
+              }
+            ]
+          },
+          "isEmailVerified": {
+            "type": "boolean"
+          },
+          "medicalCollegeName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mmbsPassingYear": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "role",
+          "isEmailVerified",
+          "medicalCollegeName",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last name"
+          },
+          "medicalCollegeName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Medical college name"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9]{7,15}$",
+            "description": "E.164-ish phone, 7-15 digits, optional leading +"
+          },
+          "mmbsPassingYear": {
+            "type": "number",
+            "minimum": 1950,
+            "maximum": 2100,
+            "description": "MBBS passing year"
+          }
+        },
+        "required": []
       }
     },
     "securitySchemes": {
@@ -475,6 +637,9 @@
   "tags": [
     {
       "name": "Auth"
+    },
+    {
+      "name": "User"
     }
   ],
   "x-samchon-emended-v4": true
