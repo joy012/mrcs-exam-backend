@@ -29,6 +29,7 @@ model User {
   phone              String?
   mmbsPassingYear    String?
   password           String
+  avatarURL          String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

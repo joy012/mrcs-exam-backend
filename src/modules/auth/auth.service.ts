@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import { ConfigService } from '../../libs/config/config.service';
 import { EmailService } from '../../libs/email/email.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';
@@ -32,6 +32,10 @@ export class AuthService {
   private async hashPassword(plain: string): Promise<string> {
     const salt = await bcrypt.genSalt(this.config.bcryptRounds);
     return bcrypt.hash(plain, salt);
+  }
+
+  private async verifyPassword(plain: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(plain, hash);
   }
 
   private signEmailToken(payload: {
@@ -84,9 +88,12 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new NotFoundException('No user found with this email!');
 
-    const passMatched = await bcrypt.compare(payload.password, user.password);
+    const passMatched = await this.verifyPassword(
+      payload.password,
+      user.password,
+    );
 
     if (!passMatched) throw new UnauthorizedException('Invalid credentials');
 
@@ -97,8 +104,18 @@ export class AuthService {
         expiresIn: this.config.jwtAccessTokenExpiresIn,
       },
     );
+
+    const refreshToken = this.jwt.sign(
+      { sub: user.id, type: 'refresh_token' },
+      {
+        secret: this.config.jwtSecret,
+        expiresIn: this.config.jwtRefreshTokenExpiresIn,
+      },
+    );
+
     return {
       accessToken,
+      refreshToken,
       user: {
         id: user.id,
         firstName: user.firstName,
@@ -106,6 +123,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
         isEmailVerified: user.isEmailVerified,
+        avatarURL: user.avatarURL ?? undefined,
       },
     };
   }

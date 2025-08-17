@@ -12,10 +12,12 @@ export interface AuthLoginResponseUser {
   email: string & tags.Format<'email'>;
   role: 'student' | 'admin';
   isEmailVerified: boolean;
+  avatarURL?: string;
 }
 
 export interface AuthLoginResponse {
   accessToken: string & tags.MinLength<1>;
+  refreshToken: string & tags.MinLength<1>;
   user: AuthLoginResponseUser;
 }
 

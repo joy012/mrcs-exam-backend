@@ -20,7 +20,7 @@ export class AdminService implements OnApplicationBootstrap {
   private async ensureAdminUser(): Promise<void> {
     const adminEmail = this.config.adminEmail;
     const adminPassword = this.config.adminPassword;
-
+    console.log({ adminEmail, adminPassword });
     if (!adminEmail || !adminPassword) {
       this.logger.warn(
         'Admin seed skipped: missing ADMIN_EMAIL, ADMIN_PASSWORD in env',

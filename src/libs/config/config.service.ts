@@ -41,10 +41,10 @@ class SmtpConfig {
 
 class AdminConfig {
   @Env('ADMIN_EMAIL')
-  email: string;
+  adminEmail: string;
 
   @Env('ADMIN_PASSWORD')
-  password: string;
+  adminPassword: string;
 }
 
 class ServerConfig {
@@ -151,11 +151,11 @@ export class ConfigService {
   }
 
   get adminEmail(): string {
-    return this.admin.email;
+    return this.admin.adminEmail;
   }
 
   get adminPassword(): string {
-    return this.admin.password;
+    return this.admin.adminPassword;
   }
   get bcryptRounds(): number {
     return this.security.bcryptRounds;

@@ -11,6 +11,7 @@ export interface UserMeResponse {
   medicalCollegeName: string;
   phone?: string;
   mmbsPassingYear?: number;
+  avatarURL?: string;
   createdAt: string & tags.Format<'date-time'>;
   updatedAt: string & tags.Format<'date-time'>;
 }

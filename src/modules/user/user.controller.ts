@@ -1,14 +1,10 @@
 import { TypedBody, TypedRoute } from '@nestia/core';
-import { Controller, Req, UseGuards } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { UserId } from 'src/common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt-guard';
 import { UpdateUserDto, UserMeResponse } from './dto';
 import { UserService } from './user.service';
-
-interface JwtRequest extends Request {
-  user?: { sub?: string; id?: string };
-}
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('User')
@@ -18,17 +14,15 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @TypedRoute.Get('me')
-  async getMe(@Req() req: JwtRequest): Promise<UserMeResponse> {
-    const userId = (req.user?.sub || req.user?.id) as string;
-    return this.userService.getMe(userId);
+  async getMe(@UserId() userId: string): Promise<UserMeResponse> {
+    return await this.userService.getMe(userId);
   }
 
   @TypedRoute.Patch('me')
   async updateMe(
-    @Req() req: JwtRequest,
+    @UserId() userId: string,
     @TypedBody() body: UpdateUserDto,
   ): Promise<UserMeResponse> {
-    const userId = (req.user?.sub || req.user?.id) as string;
     return this.userService.updateMe(userId, body);
   }
 }

@@ -21,6 +21,7 @@ export class UserService {
       mmbsPassingYear: user.mmbsPassingYear
         ? Number(user.mmbsPassingYear)
         : undefined,
+      avatarURL: user.avatarURL ?? undefined,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
@@ -41,6 +42,7 @@ export class UserService {
           payload.mmbsPassingYear !== undefined
             ? String(payload.mmbsPassingYear)
             : undefined,
+        avatarURL: payload.avatarURL,
       },
     });
 
