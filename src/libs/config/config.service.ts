@@ -20,9 +20,7 @@ class JWTConfig {
 class EmailConfig {
   @Env('EMAIL_FROM')
   from: string;
-}
 
-class SmtpConfig {
   @Env('SMTP_HOST')
   host: string;
 
@@ -67,17 +65,14 @@ class SecurityConfig {
     parseInt(value && value.length ? value : '12', 10),
   )
   bcryptRounds = 12;
+
+  @Env('APP_AUTH_KEY')
+  appAuthKey: string;
 }
 
 class BrandConfig {
   @Env('BRAND_NAME')
   name = 'Zero To MRCS';
-
-  @Env('BRAND_PRIMARY_COLOR')
-  primaryColor = '#635bff';
-
-  @Env('BRAND_LOGO_URL')
-  logoUrl = '';
 }
 
 export class ConfigService {
@@ -92,9 +87,6 @@ export class ConfigService {
 
   @Section(() => EmailConfig)
   email: EmailConfig;
-
-  @Section(() => SmtpConfig)
-  smtp: SmtpConfig;
 
   @Section(() => AdminConfig)
   admin: AdminConfig;
@@ -150,6 +142,22 @@ export class ConfigService {
     return this.email.from;
   }
 
+  get smtpHost(): string {
+    return this.email.host;
+  }
+
+  get smtpPort(): number {
+    return this.email.port;
+  }
+
+  get smtpUser(): string {
+    return this.email.user;
+  }
+
+  get smtpPass(): string {
+    return this.email.pass;
+  }
+
   get adminEmail(): string {
     return this.admin.adminEmail;
   }
@@ -157,36 +165,17 @@ export class ConfigService {
   get adminPassword(): string {
     return this.admin.adminPassword;
   }
+
   get bcryptRounds(): number {
     return this.security.bcryptRounds;
   }
 
-  get smtpHost(): string {
-    return this.smtp.host;
-  }
-
-  get smtpPort(): number {
-    return this.smtp.port;
-  }
-
-  get smtpUser(): string {
-    return this.smtp.user;
-  }
-
-  get smtpPass(): string {
-    return this.smtp.pass;
+  get appAuthKey(): string {
+    return this.security.appAuthKey;
   }
 
   get brandName(): string {
     return this.brand.name;
-  }
-
-  get brandPrimaryColor(): string {
-    return this.brand.primaryColor;
-  }
-
-  get brandLogoUrl(): string {
-    return this.brand.logoUrl;
   }
 
   // Get all configuration as a single object
@@ -196,7 +185,6 @@ export class ConfigService {
       database: this.database,
       jwt: this.jwt,
       email: this.email,
-      smtp: this.smtp,
       admin: this.admin,
       security: this.security,
       brand: this.brand,

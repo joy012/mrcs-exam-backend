@@ -30,6 +30,7 @@ model User {
   mmbsPassingYear    String?
   password           String
   avatarURL          String?
+  isDeleted          Boolean  @default(false)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

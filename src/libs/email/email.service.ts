@@ -20,11 +20,38 @@ export class EmailService {
       this.transporter = nodemailer.createTransport({
         host: this.config.smtpHost,
         port: this.config.smtpPort,
-        secure: false,
-        auth: { user: this.config.smtpUser, pass: this.config.smtpPass },
+        secure: this.config.smtpPort === 465, // true for 465, false for other ports
+        auth: {
+          user: this.config.smtpUser,
+          pass: this.config.smtpPass,
+        },
+        tls: {
+          rejectUnauthorized: false, // Only for development, remove in production
+        },
+      });
+
+      // Verify connection configuration
+      this.transporter.verify((error, success) => {
+        if (error) {
+          this.logger.error('SMTP connection failed:', error);
+        } else {
+          this.logger.log('SMTP server is ready to send emails');
+        }
       });
     }
     return this.transporter;
+  }
+
+  async testConnection(): Promise<boolean> {
+    try {
+      const transporter = this.getTransporter();
+      await transporter.verify();
+      this.logger.log('Email connection test successful');
+      return true;
+    } catch (error) {
+      this.logger.error('Email connection test failed:', error);
+      return false;
+    }
   }
 
   private async sendRaw(options: {
@@ -32,9 +59,17 @@ export class EmailService {
     subject: string;
     html: string;
   }): Promise<void> {
-    const from = this.config.emailFrom;
-    const transporter = this.getTransporter();
-    await transporter.sendMail({ from, ...options });
+    try {
+      const from = this.config.emailFrom;
+      const transporter = this.getTransporter();
+
+      this.logger.log(`Sending email to: ${options.to}`);
+      await transporter.sendMail({ from, ...options });
+      this.logger.log(`Email sent successfully to: ${options.to}`);
+    } catch (error) {
+      this.logger.error(`Failed to send email to ${options.to}:`, error);
+      throw new Error(`Email sending failed: ${error.message}`);
+    }
   }
 
   async sendTemplate<K extends TemplateKey>(
@@ -48,7 +83,6 @@ export class EmailService {
 
     const branding = {
       brandName: this.config.brandName,
-      brandLogoUrl: this.config.brandLogoUrl,
       frontendUrl: this.config.frontendUrl,
     } as const;
 

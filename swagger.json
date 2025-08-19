@@ -257,7 +257,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserMeResponse"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -296,7 +296,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserMeResponse"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -397,31 +397,28 @@
             "type": "string",
             "minLength": 1
           },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
           "user": {
-            "$ref": "#/components/schemas/AuthLoginResponseUser"
+            "$ref": "#/components/schemas/UserResponse"
           }
         },
         "required": [
           "accessToken",
+          "refreshToken",
           "user"
         ]
       },
-      "AuthLoginResponseUser": {
+      "UserResponse": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
           "email": {
-            "type": "string",
-            "format": "email"
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
           },
           "role": {
             "oneOf": [
@@ -433,17 +430,70 @@
               }
             ]
           },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
           "isEmailVerified": {
             "type": "boolean"
+          },
+          "medicalCollegeName": {
+            "type": "string"
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "mmbsPassingYear": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "avatarURL": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
+          "email",
           "id",
+          "role",
           "firstName",
           "lastName",
-          "email",
-          "role",
-          "isEmailVerified"
+          "isEmailVerified",
+          "medicalCollegeName",
+          "phone",
+          "mmbsPassingYear",
+          "avatarURL",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "AuthLoginDto": {
@@ -533,66 +583,6 @@
           "refreshToken"
         ]
       },
-      "UserMeResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "role": {
-            "oneOf": [
-              {
-                "const": "admin"
-              },
-              {
-                "const": "student"
-              }
-            ]
-          },
-          "isEmailVerified": {
-            "type": "boolean"
-          },
-          "medicalCollegeName": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "mmbsPassingYear": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "firstName",
-          "lastName",
-          "email",
-          "role",
-          "isEmailVerified",
-          "medicalCollegeName",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -621,6 +611,10 @@
             "minimum": 1950,
             "maximum": 2100,
             "description": "MBBS passing year"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "Avatar URL"
           }
         },
         "required": []

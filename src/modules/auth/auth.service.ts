@@ -123,7 +123,13 @@ export class AuthService {
         email: user.email,
         role: user.role,
         isEmailVerified: user.isEmailVerified,
-        avatarURL: user.avatarURL ?? undefined,
+        avatarURL: user.avatarURL,
+        medicalCollegeName: user.medicalCollegeName,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        mmbsPassingYear: user.mmbsPassingYear,
+        phone: user.phone,
+        isDeleted: user.isDeleted,
       },
     };
   }

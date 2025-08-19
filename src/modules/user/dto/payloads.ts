@@ -15,7 +15,4 @@ export interface UpdateUserDto {
 
   /** MBBS passing year */
   mmbsPassingYear?: number & tags.Minimum<1950> & tags.Maximum<2100>;
-
-  /** Avatar URL */
-  avatarURL?: string;
 }
