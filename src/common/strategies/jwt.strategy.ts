@@ -10,9 +10,8 @@ import { PrismaService } from '../../libs/prisma/prisma.service';
 import { UserResponse } from '../../modules/user/dto';
 
 interface JwtPayload {
-  sub: string;
+  userId: string;
   role: string;
-  isProfileComplete: boolean;
 }
 
 @Injectable()
@@ -30,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
+      where: { id: payload.userId },
     });
 
     if (!user) {

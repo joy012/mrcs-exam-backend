@@ -111,7 +111,7 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ brandName, frontendU
     <Layout previewText={`Welcome to ${brandName}`} brandName={brandName}>
       <Section style={styles.imageSection}>
         <Img
-          src="https://images.unsplash.com/photo-1529336953121-ad5a5f9bcd4b?w=1200&q=80&auto=format&fit=crop"
+          src="https://res.cloudinary.com/dlr9djjpl/image/upload/v1755615622/Screenshot_2025-08-19_at_8.55.51_PM_zvmxlz.png"
           alt="Welcome to MRCS Journey"
           style={styles.image}
         />

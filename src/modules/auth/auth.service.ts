@@ -4,22 +4,25 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, User, UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { CustomJwtService } from 'src/libs/jwt/jwt.service';
 import { ConfigService } from '../../libs/config/config.service';
 import { EmailService } from '../../libs/email/email.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';
+import { UserResponse } from '../user/dto';
 import {
   AuthCompleteProfileDto,
-  AuthCompleteProfileResponse,
   AuthLoginDto,
   AuthLoginResponse,
+  AuthResendForgotPasswordEmailDto,
+  AuthResendVerificationEmailDto,
   AuthResetPasswordDto,
   AuthSendForgotPasswordDto,
   AuthSignupDto,
   AuthSignupResponse,
   AuthVerifyEmailDto,
+  AuthVerifyEmailResponse,
 } from './dto';
 
 @Injectable()
@@ -27,7 +30,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
-    private readonly jwt: JwtService,
+    private readonly jwtService: CustomJwtService,
     private readonly config: ConfigService,
   ) {}
 
@@ -40,41 +43,7 @@ export class AuthService {
     return bcrypt.compare(plain, hash);
   }
 
-  private signEmailToken(payload: {
-    email: string;
-    purpose: 'verify' | 'reset';
-  }): string {
-    return this.jwt.sign(payload, {
-      secret: this.config.jwtSecret,
-      expiresIn: '1h',
-    });
-  }
-
-  private generateTokens(
-    userId: string,
-    role: UserRole,
-    isProfileComplete: boolean = true,
-  ): { accessToken: string; refreshToken: string } {
-    const accessToken = this.jwt.sign(
-      { sub: userId, role, isProfileComplete },
-      {
-        secret: this.config.jwtSecret,
-        expiresIn: this.config.jwtAccessTokenExpiresIn,
-      },
-    );
-
-    const refreshToken = this.jwt.sign(
-      { sub: userId, type: 'refresh_token', isProfileComplete },
-      {
-        secret: this.config.jwtSecret,
-        expiresIn: this.config.jwtRefreshTokenExpiresIn,
-      },
-    );
-
-    return { accessToken, refreshToken };
-  }
-
-  private mapUserToResponse(user: User) {
+  private mapUserToResponse(user: User): UserResponse {
     return {
       id: user.id,
       firstName: user.firstName,
@@ -89,29 +58,8 @@ export class AuthService {
       mmbsPassingYear: user.mmbsPassingYear,
       phone: user.phone,
       isDeleted: user.isDeleted,
+      isProfileCompleted: user.isProfileCompleted,
     };
-  }
-
-  private createIncompleteUser(
-    email: string,
-    tx: Omit<
-      PrismaClient,
-      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-    >,
-  ): Promise<User> {
-    return tx.user.create({
-      data: {
-        firstName: '',
-        lastName: '',
-        role: UserRole.student,
-        isEmailVerified: false,
-        medicalCollegeName: '',
-        email,
-        phone: null,
-        mmbsPassingYear: null,
-        password: '', // Will be set during profile completion
-      },
-    });
   }
 
   async signup(payload: AuthSignupDto): Promise<AuthSignupResponse> {
@@ -123,35 +71,32 @@ export class AuthService {
       throw new BadRequestException('Email already registered');
     }
 
-    // Use transaction to ensure both user creation and email sending succeed or fail together
-    const user = await this.prisma.$transaction(async (tx) => {
-      const newUser = await this.createIncompleteUser(payload.email, tx);
-
-      const token = this.signEmailToken({
-        email: newUser.email,
-        purpose: 'verify',
-      });
-
-      // Send verification email within transaction
-      await this.emailService.sendTemplate('verify-email', {
-        to: newUser.email,
-        email: newUser.email,
-        token,
-      });
-
-      return newUser;
+    // Create user first, then send email separately to avoid transaction timeout
+    const newUser = await this.prisma.user.create({
+      data: {
+        firstName: '',
+        lastName: '',
+        role: UserRole.student,
+        isEmailVerified: false,
+        medicalCollegeName: '',
+        email: payload.email,
+        phone: null,
+        mmbsPassingYear: null,
+        password: '', // Will be set during profile completion
+        isProfileCompleted: false,
+      },
     });
 
-    const { accessToken, refreshToken } = this.generateTokens(
-      user.id,
-      user.role,
-      false,
-    );
+    const token = this.jwtService.generateEmailToken(newUser.email, 'verify');
+
+    // Send verification email after user creation
+    await this.emailService.sendTemplate('verify-email', {
+      to: newUser.email,
+      email: newUser.email,
+      token,
+    });
 
     return {
-      accessToken,
-      refreshToken,
-      user: this.mapUserToResponse(user),
       message: 'Verification email sent. Please check your email to continue.',
     };
   }
@@ -159,7 +104,7 @@ export class AuthService {
   async completeProfile(
     payload: AuthCompleteProfileDto,
     userId: string,
-  ): Promise<AuthCompleteProfileResponse> {
+  ): Promise<UserResponse> {
     if (!userId) {
       throw new BadRequestException('Bad Request');
     }
@@ -190,43 +135,32 @@ export class AuthService {
 
     const passwordHash = await this.hashPassword(payload.password);
 
-    // Use transaction to ensure both profile update and welcome email sending succeed or fail together
-    const updatedUser = await this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.update({
-        where: { email: payload.email },
-        data: {
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          role: payload.role || UserRole.student,
-          medicalCollegeName: payload.medicalCollegeName,
-          phone: payload.phone ?? null,
-          mmbsPassingYear:
-            payload.mmbsPassingYear !== undefined
-              ? String(payload.mmbsPassingYear)
-              : null,
-          password: passwordHash,
-        },
-      });
-
-      // Send welcome email within transaction
-      await this.emailService.sendTemplate('welcome-email', {
-        to: user.email,
-        firstName: user.firstName,
-      });
-
-      return user;
+    // Update user profile first, then send welcome email separately
+    const updatedUser = await this.prisma.user.update({
+      where: { email: payload.email },
+      data: {
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        role: payload.role || UserRole.student,
+        medicalCollegeName: payload.medicalCollegeName,
+        phone: payload.phone ?? null,
+        mmbsPassingYear:
+          payload.mmbsPassingYear !== undefined
+            ? String(payload.mmbsPassingYear)
+            : null,
+        password: passwordHash,
+        isProfileCompleted: true,
+      },
     });
 
-    const { accessToken, refreshToken } = this.generateTokens(
-      updatedUser.id,
-      updatedUser.role,
-    );
+    // Send welcome email after profile update
+    await this.emailService.sendTemplate('welcome-email', {
+      to: updatedUser.email,
+      firstName: updatedUser.firstName,
+    });
 
-    return {
-      accessToken,
-      refreshToken,
-      user: this.mapUserToResponse(updatedUser),
-    };
+    // No token generation here - user should login after profile completion
+    return this.mapUserToResponse(updatedUser);
   }
 
   async login(payload: AuthLoginDto): Promise<AuthLoginResponse> {
@@ -240,19 +174,9 @@ export class AuthService {
 
     // Check if profile is completed
     if (!user.password || user.password.length === 0) {
-      // Return special response indicating profile completion needed
-      const { accessToken, refreshToken } = this.generateTokens(
-        user.id,
-        user.role,
-        false,
+      throw new BadRequestException(
+        'Profile not completed. Please complete your profile first.',
       );
-
-      return {
-        accessToken,
-        refreshToken,
-        user: this.mapUserToResponse(user),
-        requiresProfileCompletion: true,
-      };
     }
 
     const isPasswordValid = await this.verifyPassword(
@@ -264,7 +188,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const { accessToken, refreshToken } = this.generateTokens(
+    const { accessToken, refreshToken } = this.jwtService.generateTokens(
       user.id,
       user.role,
     );
@@ -276,13 +200,13 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(payload: AuthVerifyEmailDto): Promise<{ message: string }> {
+  async verifyEmail(
+    payload: AuthVerifyEmailDto,
+  ): Promise<AuthVerifyEmailResponse> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
 
     try {
-      decoded = this.jwt.verify(payload.token, {
-        secret: this.config.jwtSecret,
-      });
+      decoded = this.jwtService.verify(payload.token);
     } catch {
       throw new BadRequestException('Invalid verification token');
     }
@@ -291,12 +215,35 @@ export class AuthService {
       throw new BadRequestException('Invalid verification token or user email');
     }
 
+    const user = await this.prisma.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
+
+    // Update user verification status
     await this.prisma.user.update({
       where: { email: payload.email },
       data: { isEmailVerified: true },
     });
 
-    return { message: 'Email verified successfully' };
+    // Generate tokens for the verified user
+    const { accessToken, refreshToken } = this.jwtService.generateTokens(
+      user.id,
+      user.role,
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+      user: this.mapUserToResponse(user),
+    };
   }
 
   async sendForgotPassword(
@@ -310,7 +257,7 @@ export class AuthService {
       throw new NotFoundException('User with this email does not exist');
     }
 
-    const token = this.signEmailToken({ email: user.email, purpose: 'reset' });
+    const token = this.jwtService.generateEmailToken(user.email, 'reset');
 
     await this.emailService.sendTemplate('forget-pass-email', {
       to: user.email,
@@ -327,9 +274,7 @@ export class AuthService {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
 
     try {
-      decoded = this.jwt.verify(payload.token, {
-        secret: this.config.jwtSecret,
-      });
+      decoded = this.jwtService.verify(payload.token);
     } catch {
       throw new BadRequestException('Invalid reset password token');
     }
@@ -349,35 +294,74 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
-    const payload = await this.jwt.verifyAsync<{
-      sub: string;
-      type: 'refresh_token';
-      isProfileComplete: boolean;
+    const payload = await this.jwtService.verifyAsync<{
+      userId: string;
+      role: UserRole;
+      type: 'refresh';
     }>(refreshToken);
 
-    if (payload.type !== 'refresh_token') {
+    if (payload.type !== 'refresh') {
       throw new BadRequestException('Invalid refresh token');
     }
 
     const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
+      where: { id: payload.userId },
     });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const accessToken = await this.jwt.signAsync(
-      {
-        sub: user.id,
-        role: user.role,
-        isProfileComplete: user.password && user.password.length > 0,
-      },
-      {
-        secret: this.config.jwtSecret,
-        expiresIn: this.config.jwtAccessTokenExpiresIn,
-      },
-    );
+    const accessToken = this.jwtService.generateAccessToken(user.id, user.role);
 
     return { accessToken };
+  }
+
+  async resendVerificationEmail(
+    payload: AuthResendVerificationEmailDto,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User with this email does not exist');
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    const token = this.jwtService.generateEmailToken(user.email, 'verify');
+
+    await this.emailService.sendTemplate('verify-email', {
+      to: user.email,
+      email: user.email,
+      token,
+    });
+
+    return { message: 'Verification email resent successfully' };
+  }
+
+  async resendForgotPasswordEmail(
+    payload: AuthResendForgotPasswordEmailDto,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User with this email does not exist');
+    }
+
+    const token = this.jwtService.generateEmailToken(user.email, 'reset');
+
+    await this.emailService.sendTemplate('forget-pass-email', {
+      to: user.email,
+      email: user.email,
+      token,
+    });
+
+    return { message: 'Password reset email resent successfully' };
   }
 }

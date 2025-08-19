@@ -160,7 +160,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/AuthVerifyEmailResponse"
                 }
               }
             }
@@ -196,7 +196,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -232,7 +240,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -268,7 +284,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "accessToken"
+                  ]
                 }
               }
             }
@@ -277,6 +301,94 @@
         "x-samchon-accessor": [
           "auth",
           "refresh"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/resend-verification": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthResendVerificationEmailDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "resend_verification",
+          "resendVerificationEmail"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/resend-forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthResendForgotPasswordEmailDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "resend_forgot_password",
+          "resendForgotPasswordEmail"
         ],
         "x-samchon-controller": "AuthController"
       }
@@ -559,30 +671,47 @@
       "AuthSignupResponse": {
         "type": "object",
         "properties": {
-          "accessToken": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Access token for immediate authentication"
-          },
-          "refreshToken": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Refresh token for immediate authentication"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserResponse",
-            "description": "User data"
-          },
           "message": {
             "type": "string",
             "description": "Message indicating next steps"
           }
         },
         "required": [
+          "message"
+        ]
+      },
+      "AuthSignupDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthCompleteProfileResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        },
+        "required": [
           "accessToken",
           "refreshToken",
-          "user",
-          "message"
+          "user"
         ]
       },
       "UserResponse": {
@@ -656,6 +785,9 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "isProfileCompleted": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -671,41 +803,8 @@
           "avatarURL",
           "isDeleted",
           "createdAt",
-          "updatedAt"
-        ]
-      },
-      "AuthSignupDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "description": "Email"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "AuthCompleteProfileResponse": {
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string",
-            "minLength": 1
-          },
-          "refreshToken": {
-            "type": "string",
-            "minLength": 1
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserResponse"
-          }
-        },
-        "required": [
-          "accessToken",
-          "refreshToken",
-          "user"
+          "updatedAt",
+          "isProfileCompleted"
         ]
       },
       "AuthCompleteProfileDto": {
@@ -811,6 +910,30 @@
           "password"
         ]
       },
+      "AuthVerifyEmailResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Access token for immediate authentication"
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Refresh token for immediate authentication"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse",
+            "description": "User data"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "user"
+        ]
+      },
       "AuthVerifyEmailDto": {
         "type": "object",
         "properties": {
@@ -877,6 +1000,32 @@
         },
         "required": [
           "refreshToken"
+        ]
+      },
+      "AuthResendVerificationEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthResendForgotPasswordEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "UpdateUserDto": {

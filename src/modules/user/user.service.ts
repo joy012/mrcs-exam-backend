@@ -18,6 +18,7 @@ export class UserService {
       medicalCollegeName: user.medicalCollegeName,
       phone: user.phone,
       mmbsPassingYear: user.mmbsPassingYear,
+      isProfileCompleted: user.isProfileCompleted,
       avatarURL: user.avatarURL,
       isDeleted: user.isDeleted,
       createdAt: user.createdAt,

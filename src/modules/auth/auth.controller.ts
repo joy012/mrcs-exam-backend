@@ -8,6 +8,8 @@ import { AuthService } from './auth.service';
 import {
   AuthCompleteProfileDto,
   AuthLoginDto,
+  AuthResendForgotPasswordEmailDto,
+  AuthResendVerificationEmailDto,
   AuthResetPasswordDto,
   AuthSendForgotPasswordDto,
   AuthSignupDto,
@@ -60,6 +62,20 @@ export class AuthController {
   @TypedRoute.Post('refresh')
   async refresh(@TypedBody() body: RefreshTokenBody) {
     return await this.authService.refreshToken(body.refreshToken);
+  }
+
+  @TypedRoute.Post('resend-verification')
+  async resendVerificationEmail(
+    @TypedBody() body: AuthResendVerificationEmailDto,
+  ) {
+    return await this.authService.resendVerificationEmail(body);
+  }
+
+  @TypedRoute.Post('resend-forgot-password')
+  async resendForgotPasswordEmail(
+    @TypedBody() body: AuthResendForgotPasswordEmailDto,
+  ) {
+    return await this.authService.resendForgotPasswordEmail(body);
   }
 
   @TypedRoute.Get('test-email')

@@ -62,3 +62,13 @@ export interface AuthResetPasswordDto {
 export interface RefreshTokenBody {
   refreshToken: string;
 }
+
+export interface AuthResendVerificationEmailDto {
+  /** Email */
+  email: string & tags.Format<'email'>;
+}
+
+export interface AuthResendForgotPasswordEmailDto {
+  /** Email */
+  email: string & tags.Format<'email'>;
+}
