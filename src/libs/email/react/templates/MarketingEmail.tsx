@@ -1,6 +1,6 @@
-import { Img, Section } from '@react-email/components';
+import { Button, Heading, Hr, Img, Section, Text } from '@react-email/components';
 import React from 'react';
-import { Cta, HighlightBox, Layout, Paragraph, Title } from './_Layout';
+import { Layout } from './_Layout';
 
 export type MarketingEmailProps = {
   brandName: string;
@@ -19,8 +19,15 @@ const styles = {
   },
   image: {
     width: '100%',
-    borderRadius: '12px',
+    borderRadius: '8px',
     maxWidth: '100%',
+  },
+  h1: {
+    color: '#333',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '15px',
   },
   contentParagraph: {
     margin: 0,
@@ -28,12 +35,45 @@ const styles = {
     fontSize: '16px',
     lineHeight: 1.7,
   },
+  highlightBox: {
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    padding: '20px',
+    margin: '20px 0',
+  },
   stayUpdatedText: {
     color: '#64748b',
     fontSize: '14px',
     fontStyle: 'italic',
     textAlign: 'center' as const,
     margin: '24px 0 0 0',
+  },
+  lowerSection: {
+    padding: '25px 35px',
+    marginTop: '20px',
+  },
+  cautionText: {
+    color: '#333',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontSize: '14px',
+    margin: '0px',
+    lineHeight: 1.6,
+  },
+  ctaButton: {
+    display: 'inline-block',
+    background: '#7c3aed',
+    color: 'white',
+    textDecoration: 'none',
+    fontWeight: '600',
+    padding: '16px 32px',
+    borderRadius: '8px',
+    fontSize: '16px',
+    textAlign: 'center' as const,
+    border: 'none',
+    minWidth: '200px',
+    maxWidth: '280px',
+    margin: '20px 0',
   },
 };
 
@@ -48,21 +88,33 @@ export const MarketingEmail: React.FC<MarketingEmailProps> = ({ brandName, title
         />
       </Section>
 
-      <Title>{title}</Title>
+      <Heading style={styles.h1}>{title}</Heading>
 
-      <HighlightBox>
-        <Paragraph style={styles.contentParagraph}>
+      <Section style={styles.highlightBox}>
+        <Text style={styles.contentParagraph}>
           <span dangerouslySetInnerHTML={{ __html: contentHtml }} />
-        </Paragraph>
-      </HighlightBox>
+        </Text>
+      </Section>
 
       {ctaUrl && ctaLabel ? (
-        <Cta href={ctaUrl} label={ctaLabel} widthPct={50} />
+        <div style={{ textAlign: 'center' as const }}>
+          <Button href={ctaUrl} style={styles.ctaButton}>
+            {ctaLabel}
+          </Button>
+        </div>
       ) : null}
 
-      <Paragraph style={styles.stayUpdatedText}>
+      <Text style={styles.stayUpdatedText}>
         💡 <strong>Stay updated:</strong> Follow us for the latest MRCS exam tips and practice materials.
-      </Paragraph>
+      </Text>
+
+      <Hr />
+
+      <Section style={styles.lowerSection}>
+        <Text style={styles.cautionText}>
+          Keep learning and improving your MRCS exam skills with our comprehensive practice materials. Visit our platform for more resources.
+        </Text>
+      </Section>
     </Layout>
   );
 };

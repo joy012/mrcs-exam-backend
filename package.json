@@ -7,6 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:email": "pnpm dlx react-email export --dir src/libs/email/react/templates --outDir dist/emails",
+    "build:all": "pnpm run build:email && pnpm run build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -21,7 +23,8 @@
     "prepare": "ts-patch install",
     "gen:swagger": "nestia swagger",
     "gen:prisma": "prisma generate",
-    "email:dev": "pnpm dlx react-email dev --dir src/libs/email/react/templates --port 9999"
+    "email:dev": "pnpm dlx react-email dev --dir src/libs/email/react/templates --port 9999",
+    "email:preview": "pnpm dlx react-email preview --dir src/libs/email/react/templates --port 9999"
   },
   "dependencies": {
     "@anatine/zod-openapi": "^2.2.8",
@@ -40,6 +43,7 @@
     "@prisma/extension-accelerate": "^2.0.2",
     "@react-email/components": "^0.5.0",
     "@react-email/render": "^1.2.0",
+    "@types/passport-jwt": "^4.0.1",
     "atenv": "^1.0.8",
     "bcryptjs": "^3.0.2",
     "chalk": "^5.5.0",
@@ -49,6 +53,7 @@
     "mongodb": "^6.18.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
+    "passport-jwt": "^4.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "reflect-metadata": "^0.2.2",

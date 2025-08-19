@@ -160,6 +160,10 @@ export class AuthService {
     payload: AuthCompleteProfileDto,
     userId: string,
   ): Promise<AuthCompleteProfileResponse> {
+    if (!userId) {
+      throw new BadRequestException('Bad Request');
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
@@ -186,20 +190,31 @@ export class AuthService {
 
     const passwordHash = await this.hashPassword(payload.password);
 
-    const updatedUser = await this.prisma.user.update({
-      where: { email: payload.email },
-      data: {
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        role: payload.role || UserRole.student,
-        medicalCollegeName: payload.medicalCollegeName,
-        phone: payload.phone ?? null,
-        mmbsPassingYear:
-          payload.mmbsPassingYear !== undefined
-            ? String(payload.mmbsPassingYear)
-            : null,
-        password: passwordHash,
-      },
+    // Use transaction to ensure both profile update and welcome email sending succeed or fail together
+    const updatedUser = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { email: payload.email },
+        data: {
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          role: payload.role || UserRole.student,
+          medicalCollegeName: payload.medicalCollegeName,
+          phone: payload.phone ?? null,
+          mmbsPassingYear:
+            payload.mmbsPassingYear !== undefined
+              ? String(payload.mmbsPassingYear)
+              : null,
+          password: passwordHash,
+        },
+      });
+
+      // Send welcome email within transaction
+      await this.emailService.sendTemplate('welcome-email', {
+        to: user.email,
+        firstName: user.firstName,
+      });
+
+      return user;
     });
 
     const { accessToken, refreshToken } = this.generateTokens(
@@ -261,7 +276,7 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(payload: AuthVerifyEmailDto): Promise<string> {
+  async verifyEmail(payload: AuthVerifyEmailDto): Promise<{ message: string }> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
 
     try {
@@ -276,27 +291,17 @@ export class AuthService {
       throw new BadRequestException('Invalid verification token or user email');
     }
 
-    const user = await this.prisma.user.update({
+    await this.prisma.user.update({
       where: { email: payload.email },
       data: { isEmailVerified: true },
     });
 
-    try {
-      await this.emailService.sendTemplate('welcome-email', {
-        to: user.email,
-        firstName: user.firstName,
-      });
-    } catch (error) {
-      // Log error but don't fail the verification endpoint
-      console.error('Failed to send welcome email:', error);
-    }
-
-    return 'Email verified successfully';
+    return { message: 'Email verified successfully' };
   }
 
   async sendForgotPassword(
     payload: AuthSendForgotPasswordDto,
-  ): Promise<string> {
+  ): Promise<{ message: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
@@ -313,10 +318,12 @@ export class AuthService {
       token,
     });
 
-    return 'Recovery password email sent successfully';
+    return { message: 'Recovery password email sent successfully' };
   }
 
-  async resetPassword(payload: AuthResetPasswordDto): Promise<string> {
+  async resetPassword(
+    payload: AuthResetPasswordDto,
+  ): Promise<{ message: string }> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
 
     try {
@@ -338,29 +345,39 @@ export class AuthService {
       data: { password: passwordHash },
     });
 
-    return 'Password reset successful';
+    return { message: 'Password reset successful' };
   }
 
-  async refreshToken(refreshToken: string): Promise<string> {
-    const { id, type } = await this.jwt.verifyAsync<{
-      id: string;
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
+    const payload = await this.jwt.verifyAsync<{
+      sub: string;
       type: 'refresh_token';
+      isProfileComplete: boolean;
     }>(refreshToken);
 
-    if (type !== 'refresh_token') {
+    if (payload.type !== 'refresh_token') {
       throw new BadRequestException('Invalid refresh token');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     const accessToken = await this.jwt.signAsync(
-      { id: user.id, type: 'access_token' },
-      { expiresIn: this.config.jwtAccessTokenExpiresIn },
+      {
+        sub: user.id,
+        role: user.role,
+        isProfileComplete: user.password && user.password.length > 0,
+      },
+      {
+        secret: this.config.jwtSecret,
+        expiresIn: this.config.jwtAccessTokenExpiresIn,
+      },
     );
 
-    return accessToken;
+    return { accessToken };
   }
 }

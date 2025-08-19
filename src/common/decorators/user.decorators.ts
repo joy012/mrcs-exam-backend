@@ -12,7 +12,27 @@ export const UserId = createParamDecorator(
   (_, ctx: ExecutionContext): string => {
     const request = ctx.switchToHttp().getRequest();
 
+    if (!request.user) {
+      throw new Error(
+        'User not found in request. Make sure JWT guard is applied.',
+      );
+    }
+
     return (request.user as UserResponse).id;
+  },
+);
+
+export const UserRole = createParamDecorator(
+  (_, ctx: ExecutionContext): string => {
+    const request = ctx.switchToHttp().getRequest();
+
+    if (!request.user) {
+      throw new Error(
+        'User not found in request. Make sure JWT guard is applied.',
+      );
+    }
+
+    return (request.user as UserResponse).role;
   },
 );
 

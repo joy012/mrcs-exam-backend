@@ -1,6 +1,6 @@
-import { Img, Section } from '@react-email/components';
+import { Button, Heading, Hr, Img, Link, Section, Text } from '@react-email/components';
 import React from 'react';
-import { Cta, HighlightBox, Layout, Paragraph, Title } from './_Layout';
+import { Layout } from './_Layout';
 
 export type WelcomeEmailProps = {
   brandName: string;
@@ -16,8 +16,29 @@ const styles = {
   },
   image: {
     width: '100%',
-    borderRadius: '12px',
+    borderRadius: '8px',
     maxWidth: '100%',
+  },
+  h1: {
+    color: '#333',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '15px',
+  },
+  mainText: {
+    color: '#333',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontSize: '14px',
+    marginBottom: '14px',
+    lineHeight: 1.6,
+  },
+  highlightBox: {
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+    padding: '20px',
+    margin: '20px 0',
   },
   highlightTitle: {
     margin: '0 0 8px 0',
@@ -29,7 +50,7 @@ const styles = {
   highlightSubtitle: {
     margin: 0,
     textAlign: 'center' as const,
-    color: '#8b5cf6',
+    color: '#7c3aed',
     fontSize: '14px',
     fontWeight: '500',
   },
@@ -41,7 +62,7 @@ const styles = {
   },
   featureItem: {
     margin: '6px 0',
-    color: '#8b5cf6',
+    color: '#7c3aed',
     fontSize: '14px',
   },
   proTip: {
@@ -50,11 +71,42 @@ const styles = {
     fontStyle: 'italic',
     margin: '20px 0 0 0',
   },
+  lowerSection: {
+    padding: '25px 35px',
+    marginTop: '20px',
+  },
+  cautionText: {
+    color: '#333',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    fontSize: '14px',
+    margin: '0px',
+    lineHeight: 1.6,
+  },
+  ctaButton: {
+    display: 'inline-block',
+    background: '#7c3aed',
+    color: 'white',
+    textDecoration: 'none',
+    fontWeight: '600',
+    padding: '16px 32px',
+    borderRadius: '8px',
+    fontSize: '16px',
+    textAlign: 'center' as const,
+    border: 'none',
+    minWidth: '200px',
+    maxWidth: '280px',
+    margin: '20px 0',
+  },
+  link: {
+    color: '#7c3aed',
+    textDecoration: 'underline',
+  },
 };
 
 export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ brandName, frontendUrl, firstName }) => {
   const nameSuffix = firstName?.trim() ? `, ${firstName.trim()}` : '';
-  const dashboardUrl = frontendUrl.replace(/\/$/, '');
+  const dashboardUrl = frontendUrl ? frontendUrl.replace(/\/$/, '') : 'http://localhost:3000';
+
   return (
     <Layout previewText={`Welcome to ${brandName}`} brandName={brandName}>
       <Section style={styles.imageSection}>
@@ -65,30 +117,42 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ brandName, frontendU
         />
       </Section>
 
-      <Title>Welcome{nameSuffix} 👋</Title>
-      <Paragraph>
+      <Heading style={styles.h1}>Welcome{nameSuffix} 👋</Heading>
+      <Text style={styles.mainText}>
         We're thrilled to have you join {brandName}. Your account is now active and ready to help you excel in your MRCS journey.
-      </Paragraph>
+      </Text>
 
-      <HighlightBox>
-        <div style={styles.highlightTitle}>
+      <Section style={styles.highlightBox}>
+        <Text style={styles.highlightTitle}>
           🚀 <strong>What's next?</strong>
-        </div>
-        <div style={styles.highlightSubtitle}>
+        </Text>
+        <Text style={styles.highlightSubtitle}>
           Start exploring your personalized learning experience:
-        </div>
+        </Text>
         <ul style={styles.featureList}>
           <li style={styles.featureItem}>✓ Access practice exams & questions</li>
           <li style={styles.featureItem}>✓ Track your progress</li>
           <li style={styles.featureItem}>✓ View performance analytics</li>
         </ul>
-      </HighlightBox>
+      </Section>
 
-      <Paragraph style={styles.proTip}>
+      <Text style={styles.proTip}>
         💡 <strong>Pro tip:</strong> You can manage your profile and settings anytime from your dashboard.
-      </Paragraph>
+      </Text>
 
-      <Cta href={dashboardUrl} label="Go to Dashboard" widthPct={50} />
+      <div style={{ textAlign: 'center' as const }}>
+        <Button href={dashboardUrl} style={styles.ctaButton}>
+          Go to Dashboard
+        </Button>
+      </div>
+
+      <Hr />
+
+      <Section style={styles.lowerSection}>
+        <Text style={styles.cautionText}>
+          Ready to start your MRCS journey? Click the button above to access your personalized dashboard or visit <Link href={dashboardUrl} style={styles.link}>{dashboardUrl}</Link>
+        </Text>
+      </Section>
     </Layout>
   );
 };

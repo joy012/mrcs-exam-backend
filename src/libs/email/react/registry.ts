@@ -1,5 +1,5 @@
 import { render } from '@react-email/render';
-import React from 'react';
+import * as React from 'react';
 import { MarketingEmail } from './templates/MarketingEmail';
 import { ResetPassword } from './templates/ResetPassword';
 import { VerifyEmail } from './templates/VerifyEmail';
@@ -42,19 +42,55 @@ export type TemplateRegistry = { [K in TemplateKey]: TemplateRegistryItem<K> };
 
 export const templateRegistry: TemplateRegistry = {
   'verify-email': {
-    render: async (props) => render(React?.createElement(VerifyEmail, props)),
+    render: async (props) => {
+      try {
+        const element = React.createElement(VerifyEmail, props);
+        const rendered = await render(element);
+        return rendered;
+      } catch (error) {
+        console.error('Error rendering verify-email template:', error);
+        throw error;
+      }
+    },
     defaultSubject: () => 'Verify your email',
   },
   'welcome-email': {
-    render: async (props) => render(React.createElement(WelcomeEmail, props)),
+    render: async (props) => {
+      try {
+        const element = React.createElement(WelcomeEmail, props);
+        const rendered = await render(element);
+        return rendered;
+      } catch (error) {
+        console.error('Error rendering welcome-email template:', error);
+        throw error;
+      }
+    },
     defaultSubject: (props) => `Welcome to ${props.brandName}`,
   },
   'forget-pass-email': {
-    render: async (props) => render(React.createElement(ResetPassword, props)),
+    render: async (props) => {
+      try {
+        const element = React.createElement(ResetPassword, props);
+        const rendered = await render(element);
+        return rendered;
+      } catch (error) {
+        console.error('Error rendering forget-pass-email template:', error);
+        throw error;
+      }
+    },
     defaultSubject: () => 'Reset your password',
   },
   'marketing-email': {
-    render: async (props) => render(React.createElement(MarketingEmail, props)),
+    render: async (props) => {
+      try {
+        const element = React.createElement(MarketingEmail, props);
+        const rendered = await render(element);
+        return rendered;
+      } catch (error) {
+        console.error('Error rendering marketing-email template:', error);
+        throw error;
+      }
+    },
     defaultSubject: (props) => props.title,
   },
 };
