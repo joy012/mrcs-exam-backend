@@ -89,7 +89,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthCompleteProfileResponse"
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -664,6 +664,804 @@
         ],
         "x-samchon-controller": "UserController"
       }
+    },
+    "/exam-intake": {
+      "get": {
+        "tags": [
+          "Exam Intake"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "oneOf": [
+                          {
+                            "const": "JANUARY"
+                          },
+                          {
+                            "const": "APRIL_MAY"
+                          },
+                          {
+                            "const": "SEPTEMBER"
+                          }
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "displayName": {
+                        "type": "string"
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "isDefault": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "createdAt",
+                      "updatedAt",
+                      "displayName",
+                      "isActive",
+                      "isDefault"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "exam_intake",
+          "getAllExamIntakes"
+        ],
+        "x-samchon-controller": "ExamIntakeController"
+      }
+    },
+    "/exam-intake/{id}": {
+      "get": {
+        "tags": [
+          "Exam Intake"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "JANUARY"
+                        },
+                        {
+                          "const": "APRIL_MAY"
+                        },
+                        {
+                          "const": "SEPTEMBER"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "exam_intake",
+          "getExamIntakeById"
+        ],
+        "x-samchon-controller": "ExamIntakeController"
+      }
+    },
+    "/exam-intake/{id}/active-status": {
+      "patch": {
+        "tags": [
+          "Exam Intake"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamIntakeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "JANUARY"
+                        },
+                        {
+                          "const": "APRIL_MAY"
+                        },
+                        {
+                          "const": "SEPTEMBER"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "exam_intake",
+          "active_status",
+          "updateExamIntakeActiveStatus"
+        ],
+        "x-samchon-controller": "ExamIntakeController"
+      }
+    },
+    "/question-category": {
+      "get": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "oneOf": [
+                          {
+                            "const": "BASIC"
+                          },
+                          {
+                            "const": "CLINICAL"
+                          }
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "displayName": {
+                        "type": "string"
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "isDefault": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "createdAt",
+                      "updatedAt",
+                      "displayName",
+                      "isActive",
+                      "isDefault"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "getAllQuestionCategories"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      },
+      "post": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "BASIC"
+                        },
+                        {
+                          "const": "CLINICAL"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "createQuestionCategory"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      }
+    },
+    "/question-category/type/{type}": {
+      "get": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "schema": {
+              "oneOf": [
+                {
+                  "const": "BASIC"
+                },
+                {
+                  "const": "CLINICAL"
+                }
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "oneOf": [
+                          {
+                            "const": "BASIC"
+                          },
+                          {
+                            "const": "CLINICAL"
+                          }
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "displayName": {
+                        "type": "string"
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "isDefault": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "createdAt",
+                      "updatedAt",
+                      "displayName",
+                      "isActive",
+                      "isDefault"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "type",
+          "getQuestionCategoriesByType"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      }
+    },
+    "/question-category/{id}": {
+      "get": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "BASIC"
+                        },
+                        {
+                          "const": "CLINICAL"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "getQuestionCategoryById"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      },
+      "patch": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "BASIC"
+                        },
+                        {
+                          "const": "CLINICAL"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "updateQuestionCategory"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      },
+      "delete": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "deleteQuestionCategory"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      }
+    },
+    "/question-category/{id}/active-status": {
+      "patch": {
+        "tags": [
+          "Question Category"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "isActive"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "oneOf": [
+                        {
+                          "const": "BASIC"
+                        },
+                        {
+                          "const": "CLINICAL"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "createdAt",
+                    "updatedAt",
+                    "displayName",
+                    "isActive",
+                    "isDefault"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_category",
+          "active_status",
+          "updateQuestionCategoryActiveStatus"
+        ],
+        "x-samchon-controller": "QuestionCategoryController"
+      }
     }
   },
   "components": {
@@ -691,27 +1489,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "AuthCompleteProfileResponse": {
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string",
-            "minLength": 1
-          },
-          "refreshToken": {
-            "type": "string",
-            "minLength": 1
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserResponse"
-          }
-        },
-        "required": [
-          "accessToken",
-          "refreshToken",
-          "user"
         ]
       },
       "UserResponse": {
@@ -869,10 +1646,6 @@
       "AuthLoginResponse": {
         "type": "object",
         "properties": {
-          "requiresProfileCompletion": {
-            "type": "boolean",
-            "description": "Indicates if profile completion is required"
-          },
           "accessToken": {
             "type": "string",
             "minLength": 1
@@ -1059,6 +1832,57 @@
           }
         },
         "required": []
+      },
+      "UpdateExamIntakeDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isActive"
+        ]
+      },
+      "CreateQuestionCategoryDto": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name for the question category"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "const": "BASIC"
+              },
+              {
+                "const": "CLINICAL"
+              }
+            ],
+            "description": "Type of question category"
+          }
+        },
+        "required": [
+          "displayName",
+          "type"
+        ]
+      },
+      "UpdateQuestionCategoryDto": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name for the question category"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the category is active"
+          }
+        },
+        "required": []
       }
     },
     "securitySchemes": {
@@ -1075,6 +1899,12 @@
     },
     {
       "name": "User"
+    },
+    {
+      "name": "Exam Intake"
+    },
+    {
+      "name": "Question Category"
     }
   ],
   "x-samchon-emended-v4": true

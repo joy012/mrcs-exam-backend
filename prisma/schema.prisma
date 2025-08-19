@@ -18,6 +18,17 @@ enum UserRole {
   admin
 }
 
+enum ExamIntakeType {
+  JANUARY
+  APRIL_MAY
+  SEPTEMBER
+}
+
+enum QuestionCategoryType {
+  BASIC
+  CLINICAL
+}
+
 model User {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName          String
@@ -34,4 +45,24 @@ model User {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   isProfileCompleted Boolean  @default(false)
+}
+
+model ExamIntake {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  type        ExamIntakeType
+  displayName String
+  isActive    Boolean          @default(true)
+  isDefault   Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model QuestionCategory {
+  id          String                @id @default(auto()) @map("_id") @db.ObjectId
+  displayName String
+  type        QuestionCategoryType
+  isActive    Boolean               @default(true)
+  isDefault   Boolean               @default(false)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
 }

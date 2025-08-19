@@ -55,6 +55,8 @@ export class AdminService implements OnApplicationBootstrap {
         lastName: 'Admin',
         role: UserRole.admin,
         isEmailVerified: true,
+        avatarURL: null,
+        isProfileCompleted: true,
         medicalCollegeName: 'SOMC',
         email: adminEmail,
         password: passwordHash,

@@ -6,6 +6,8 @@ import { EmailModule } from './libs/email/email.module';
 import { PrismaModule } from './libs/prisma/prisma.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ExamIntakeModule } from './modules/examIntake/examIntake.module';
+import { QuestionCategoryModule } from './modules/questionCategory/questionCategory.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -16,6 +18,8 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     AdminModule,
     UserModule,
+    ExamIntakeModule,
+    QuestionCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
