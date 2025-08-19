@@ -67,6 +67,42 @@
         "x-samchon-controller": "AuthController"
       }
     },
+    "/auth/complete-profile": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthCompleteProfileDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthCompleteProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "complete_profile",
+          "completeProfile"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
     "/auth/login": {
       "post": {
         "tags": [
@@ -245,6 +281,44 @@
         "x-samchon-controller": "AuthController"
       }
     },
+    "/auth/test-email": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "test_email",
+          "testEmail"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
     "/user/me": {
       "get": {
         "tags": [
@@ -314,6 +388,170 @@
         ],
         "x-samchon-controller": "UserController"
       }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "getAllUsers"
+        ],
+        "x-samchon-controller": "UserController"
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "getUserByID"
+        ],
+        "x-samchon-controller": "UserController"
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "updateUserByID"
+        ],
+        "x-samchon-controller": "UserController"
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "deleteUserByID"
+        ],
+        "x-samchon-controller": "UserController"
+      }
     }
   },
   "components": {
@@ -321,94 +559,30 @@
       "AuthSignupResponse": {
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Created user ID"
-          }
-        },
-        "required": [
-          "userId"
-        ]
-      },
-      "AuthSignupDto": {
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string",
-            "minLength": 1,
-            "description": "First name"
-          },
-          "lastName": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Last name"
-          },
-          "role": {
-            "oneOf": [
-              {
-                "const": "admin"
-              },
-              {
-                "const": "student"
-              }
-            ],
-            "description": "Role, defaults to student"
-          },
-          "medicalCollegeName": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Medical college name"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "description": "Email"
-          },
-          "phone": {
-            "type": "string",
-            "pattern": "^[+]?[0-9]{7,15}$",
-            "description": "E.164-ish phone, 7-15 digits, optional leading +"
-          },
-          "mmbsPassingYear": {
-            "type": "number",
-            "minimum": 1950,
-            "maximum": 2100,
-            "description": "MBBS passing year"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "description": "Password (min 8 chars)"
-          }
-        },
-        "required": [
-          "firstName",
-          "lastName",
-          "medicalCollegeName",
-          "email",
-          "password"
-        ]
-      },
-      "AuthLoginResponse": {
-        "type": "object",
-        "properties": {
           "accessToken": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Access token for immediate authentication"
           },
           "refreshToken": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Refresh token for immediate authentication"
           },
           "user": {
-            "$ref": "#/components/schemas/UserResponse"
+            "$ref": "#/components/schemas/UserResponse",
+            "description": "User data"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message indicating next steps"
           }
         },
         "required": [
           "accessToken",
           "refreshToken",
-          "user"
+          "user",
+          "message"
         ]
       },
       "UserResponse": {
@@ -472,6 +646,9 @@
               }
             ]
           },
+          "isDeleted": {
+            "type": "boolean"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -492,8 +669,127 @@
           "phone",
           "mmbsPassingYear",
           "avatarURL",
+          "isDeleted",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "AuthSignupDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthCompleteProfileResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "user"
+        ]
+      },
+      "AuthCompleteProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last name"
+          },
+          "role": {
+            "oneOf": [
+              {
+                "const": "admin"
+              },
+              {
+                "const": "student"
+              }
+            ],
+            "description": "Role, defaults to student"
+          },
+          "medicalCollegeName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Medical college name"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9]{7,15}$",
+            "description": "E.164-ish phone, 7-15 digits, optional leading +"
+          },
+          "mmbsPassingYear": {
+            "type": "number",
+            "minimum": 1950,
+            "maximum": 2100,
+            "description": "MBBS passing year"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Password (min 8 chars)"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email for verification"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "medicalCollegeName",
+          "password",
+          "email"
+        ]
+      },
+      "AuthLoginResponse": {
+        "type": "object",
+        "properties": {
+          "requiresProfileCompletion": {
+            "type": "boolean",
+            "description": "Indicates if profile completion is required"
+          },
+          "accessToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refreshToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "user"
         ]
       },
       "AuthLoginDto": {
@@ -611,10 +907,6 @@
             "minimum": 1950,
             "maximum": 2100,
             "description": "MBBS passing year"
-          },
-          "avatarURL": {
-            "type": "string",
-            "description": "Avatar URL"
           }
         },
         "required": []

@@ -1,26 +1,48 @@
 import React from 'react';
-import { Cta, Layout, Paragraph, Title } from './_Layout';
+import { Cta, Layout, Paragraph, Subtitle, Title } from './_Layout';
 
 export type VerifyEmailProps = {
   brandName: string;
-  brandPrimaryColor: string;
-  brandLogoUrl?: string;
   frontendUrl: string;
   email: string;
   token: string;
 };
 
-export const VerifyEmail: React.FC<VerifyEmailProps> = ({ brandName, brandPrimaryColor, brandLogoUrl, frontendUrl, email, token }) => {
+// Email-specific styles
+const styles = {
+  fallbackText: {
+    textAlign: 'center' as const,
+    color: '#64748b',
+    fontSize: '14px',
+    margin: '20px 0 0 0',
+  },
+  fallbackLink: {
+    color: '#8b5cf6',
+    textDecoration: 'underline',
+    wordBreak: 'break-all' as const,
+    fontSize: '12px',
+  },
+};
+
+export const VerifyEmail: React.FC<VerifyEmailProps> = ({ brandName, frontendUrl, email, token }) => {
   const verifyUrl = `${frontendUrl.replace(/\/$/, '')}/verify-email?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
   return (
-    <Layout previewText={`Verify your email for ${brandName}`} brandName={brandName} brandPrimaryColor={brandPrimaryColor} brandLogoUrl={brandLogoUrl}>
+    <Layout previewText={`Verify your email for ${brandName}`} brandName={brandName}>
       <Title>Verify your email</Title>
-      <Paragraph>Thanks for signing up for {brandName}. Please confirm your email address to activate your account and start exploring your dashboard.</Paragraph>
-      <Cta href={verifyUrl} label="Verify Email" brandPrimaryColor={brandPrimaryColor} />
+      <Subtitle>Welcome to your MRCS journey!</Subtitle>
+
       <Paragraph>
-        If the button does not work, use this link:
+        Thanks for signing up for {brandName}. Please confirm your email address to activate your account and start exploring your personalized dashboard.
+      </Paragraph>
+
+      <Cta href={verifyUrl} label="Verify Email" widthPct={50} />
+
+      <Paragraph style={styles.fallbackText}>
+        If the button doesn't work, you can also copy and paste this link into your browser:
         <br />
-        <a href={verifyUrl} className="text-sky-600 underline">{verifyUrl}</a>
+        <a href={verifyUrl} style={styles.fallbackLink}>
+          {verifyUrl}
+        </a>
       </Paragraph>
     </Layout>
   );
@@ -29,9 +51,7 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ brandName, brandPrimar
 // Provide default preview props for the React Email dev server
 const VerifyEmailWithPreview = Object.assign(VerifyEmail, {
   PreviewProps: {
-    brandName: 'MRCS Exam',
-    brandPrimaryColor: '#2563eb',
-    brandLogoUrl: 'https://dummyimage.com/112x28/2563eb/ffffff&text=MRCS',
+    brandName: 'Zero To MRCS',
     frontendUrl: 'http://localhost:3000',
     email: 'user@example.com',
     token: 'abcdef123456',

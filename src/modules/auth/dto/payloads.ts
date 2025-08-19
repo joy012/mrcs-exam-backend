@@ -1,6 +1,11 @@
 import { tags } from 'typia';
 
 export interface AuthSignupDto {
+  /** Email */
+  email: string & tags.Format<'email'>;
+}
+
+export interface AuthCompleteProfileDto {
   /** First name */
   firstName: string & tags.MinLength<1>;
 
@@ -13,9 +18,6 @@ export interface AuthSignupDto {
   /** Medical college name */
   medicalCollegeName: string & tags.MinLength<1>;
 
-  /** Email */
-  email: string & tags.Format<'email'>;
-
   /** E.164-ish phone, 7-15 digits, optional leading + */
   phone?: string & tags.Pattern<'^[+]?[0-9]{7,15}$'>;
 
@@ -24,6 +26,9 @@ export interface AuthSignupDto {
 
   /** Password (min 8 chars) */
   password: string & tags.MinLength<8>;
+
+  /** Email for verification */
+  email: string & tags.Format<'email'>;
 }
 
 export interface AuthLoginDto {

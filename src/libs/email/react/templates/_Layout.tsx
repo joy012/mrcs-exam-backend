@@ -1,90 +1,205 @@
-import { Body, Button, Container, Head, Heading, Hr, Html, Img, Preview, Section, Tailwind, Text } from '@react-email/components';
+import { Body, Button, Container, Head, Heading, Html, Preview, Section, Tailwind, Text } from '@react-email/components';
 import React from 'react';
 
 export type LayoutProps = {
   previewText?: string;
   brandName: string;
-  brandPrimaryColor: string;
-  brandLogoUrl?: string;
   children: React.ReactNode;
 };
 
-export const Layout: React.FC<LayoutProps> = ({ previewText, brandName, brandPrimaryColor, brandLogoUrl, children }) => {
-  const darkenHexColor = (hex: string, percent: number): string => {
-    const safeHex = hex.replace('#', '');
-    const bigint = parseInt(safeHex.length === 3 ? safeHex.split('').map((c) => c + c).join('') : safeHex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    const adjust = (c: number) => Math.max(0, Math.min(255, Math.round(c * (1 - percent / 100))));
-    const rr = adjust(r).toString(16).padStart(2, '0');
-    const gg = adjust(g).toString(16).padStart(2, '0');
-    const bb = adjust(b).toString(16).padStart(2, '0');
-    return `#${rr}${gg}${bb}`;
-  };
+// Email-compatible styles object
+const styles = {
+  body: {
+    fontFamily: 'Inter, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif',
+    background: '#fafafa',
+    margin: 0,
+    padding: 0,
+    color: '#1e293b',
+  },
+  container: {
+    margin: '24px auto',
+    maxWidth: '640px',
+    padding: '20px',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  },
+  header: {
+    padding: '20px 32px',
+    textAlign: 'center' as const,
+    background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+  },
+  headerPattern: {
+    display: 'none',
+  },
+  logo: {
+    margin: '0 auto 12px',
+    width: '48px',
+    height: '48px',
+    background: '#ffffff',
+    borderRadius: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    border: '2px solid rgba(255,255,255,0.3)',
+  },
+  headerTitle: {
+    margin: 0,
+    color: 'white',
+    fontSize: '22px',
+    fontWeight: 'bold',
+    letterSpacing: '-0.025em',
+  },
+  headerSubtitle: {
+    margin: '4px 0 0 0',
+    color: '#f3e8ff',
+    fontSize: '14px',
+    opacity: 0.95,
+  },
+  content: {
+    padding: '32px 32px',
+    lineHeight: 1.6,
+    background: '#ffffff',
+  },
+  footer: {
+    textAlign: 'center' as const,
+    padding: '24px 32px',
+    color: '#64748b',
+    fontSize: '14px',
+    borderTop: '1px solid #f1f5f9',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+  },
+  footerText: {
+    margin: 0,
+    color: '#475569',
+    fontWeight: '500',
+  },
+  footerSubtext: {
+    margin: '6px 0 0 0',
+    color: '#64748b',
+    fontSize: '12px',
+  },
+  ctaSection: {
+    textAlign: 'center' as const,
+    margin: '24px 0',
+  },
+  ctaButton: {
+    width: '50%',
+    minWidth: '200px',
+  },
+  paragraph: {
+    color: '#334155',
+    fontSize: '16px',
+    lineHeight: 1.6,
+    margin: '0 0 12px 0',
+  },
+  title: {
+    margin: '0 0 12px 0',
+    letterSpacing: '-0.025em',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  subtitle: {
+    margin: '0 0 16px 0',
+    color: '#475569',
+    fontSize: '17px',
+    fontWeight: '500',
+  },
+};
 
-  const headerGradientEnd = darkenHexColor(brandPrimaryColor, 12);
+export const Layout: React.FC<LayoutProps> = ({ previewText, brandName, children }) => {
   return (
     <Html>
       <Head>
         {/* Viewport for mobile scaling */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Google Fonts (many clients gracefully fall back if unsupported) */}
+        {/* Google Fonts */}
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        {/* Basic link styling in all templates */}
+        {/* Email-compatible styles */}
         <style>
-          {`a { color: ${brandPrimaryColor}; text-decoration: underline; }
-            img { max-width: 100% !important; height: auto !important; display: block; }
+          {`
+            a { 
+              color: #8b5cf6; 
+              text-decoration: underline; 
+            }
+            img { 
+              max-width: 100% !important; 
+              height: auto !important; 
+              display: block; 
+            }
+            .email-button {
+              display: inline-block;
+              background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+              color: white;
+              text-decoration: none;
+              font-weight: 600;
+              padding: 16px 32px;
+              border-radius: 16px;
+              font-size: 16px;
+              text-align: center;
+              border: none;
+              min-width: 200px;
+            }
+            .highlight-box {
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 16px;
+              padding: 20px;
+              margin: 20px 0;
+            }
           `}
         </style>
       </Head>
       {previewText ? <Preview>{previewText}</Preview> : null}
       <Tailwind>
-        <Body
-          className="bg-[#f5f7fb] text-slate-900"
-          style={{
-            fontFamily: 'Inter, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif',
-            backgroundImage: 'linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%)',
-          }}
-        >
-          <Container className="mx-auto my-0 max-w-[640px] p-6">
-            {/* Card */}
-            <Section className="bg-white border border-slate-100 rounded-2xl shadow-[0_12px_30px_rgba(17,24,39,.06)] overflow-hidden">
-              {/* Killer branded header */}
-              <Section
-                className="px-6 pt-7 pb-7"
-                style={{
-                  backgroundColor: brandPrimaryColor,
-                  backgroundImage: `linear-gradient(90deg, ${brandPrimaryColor}, ${headerGradientEnd})`,
-                  textAlign: 'center',
-                }}
-              >
-                {brandLogoUrl ? (
-                  <Img
-                    src={brandLogoUrl}
-                    alt={brandName}
-                    style={{ display: 'block', margin: '0 auto', height: 28 }}
-                  />
-                ) : null}
-                <Heading as="h3" className="!m-0 text-white text-[20px] font-semibold tracking-tight mt-3">
+        <Body style={styles.body}>
+          <Container style={styles.container}>
+            {/* Modern Card with Soft Shadows */}
+            <Section style={styles.card}>
+              {/* Beautiful Header with Gradient */}
+              <Section style={styles.header}>
+                {/* Subtle background patterns */}
+                <div style={styles.headerPattern} />
+
+                {/* Modern Logo */}
+                <div style={styles.logo}>
+                  ZM
+                </div>
+
+                <Heading as="h3" style={styles.headerTitle}>
                   {brandName}
                 </Heading>
-              </Section>
-              <Section className="px-6 pt-5 pb-2">
-                <Hr className="border-slate-100" />
+
+                {/* Subtle subtitle */}
+                <Text style={styles.headerSubtitle}>
+                  Master the MRCS with Confidence
+                </Text>
               </Section>
 
-              {/* Content */}
-              <Section className="px-6 pb-6 leading-relaxed">
+              {/* Content with Soft Background */}
+              <Section style={styles.content}>
                 {children}
               </Section>
 
-              {/* Footer */}
-              <Section className="text-center px-6 pb-6 text-slate-500 text-xs">
-                © {new Date().getFullYear()} {brandName}. All rights reserved.
+              {/* Modern Footer */}
+              <Section style={styles.footer}>
+                <Text style={styles.footerText}>
+                  © {new Date().getFullYear()} {brandName}. All rights reserved.
+                </Text>
+                <Text style={styles.footerSubtext}>
+                  Empowering medical professionals to excel in their MRCS journey
+                </Text>
               </Section>
             </Section>
           </Container>
@@ -94,12 +209,15 @@ export const Layout: React.FC<LayoutProps> = ({ previewText, brandName, brandPri
   );
 };
 
-export const Cta: React.FC<{ href: string; label: string; brandPrimaryColor: string; widthPct?: number }> = ({ href, label, brandPrimaryColor, widthPct }) => (
-  <Section className="text-center my-3">
+export const Cta: React.FC<{ href: string; label: string; widthPct?: number }> = ({ href, label, widthPct = 50 }) => (
+  <Section style={styles.ctaSection}>
     <Button
       href={href}
-      className="inline-block no-underline text-white font-semibold px-4 py-3 rounded-lg text-[15px] shadow-[0_6px_14px_rgba(37,99,235,.35)]"
-      style={{ backgroundColor: brandPrimaryColor, width: widthPct ? `${Math.max(10, Math.min(100, widthPct))}%` : undefined }}
+      className="email-button"
+      style={{
+        ...styles.ctaButton,
+        width: `${widthPct}%`,
+      }}
     >
       {label}
     </Button>
@@ -107,13 +225,27 @@ export const Cta: React.FC<{ href: string; label: string; brandPrimaryColor: str
 );
 
 export const Paragraph: React.FC<React.PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
-  <Text className={`text-slate-700 text-[15px] leading-7 ${className ?? ''}`.trim()}>{children}</Text>
+  <Text style={styles.paragraph}>
+    {children}
+  </Text>
 );
 
 export const Title: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <Heading as="h2" className="!m-0 mb-3 tracking-tight text-[20px] font-bold">
+  <Heading as="h2" style={styles.title}>
     {children}
   </Heading>
+);
+
+export const Subtitle: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <Text style={styles.subtitle}>
+    {children}
+  </Text>
+);
+
+export const HighlightBox: React.FC<React.PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
+  <Section className="highlight-box">
+    {children}
+  </Section>
 );
 
 

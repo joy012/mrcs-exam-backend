@@ -7,7 +7,6 @@ import { WelcomeEmail } from './templates/WelcomeEmail';
 
 export type BrandingProps = {
   brandName: string;
-  brandLogoUrl?: string;
   frontendUrl: string;
 };
 
