@@ -1551,6 +1551,201 @@
           "getAllQuestions"
         ],
         "x-samchon-controller": "QuestionController"
+      },
+      "post": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateQuestionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "createQuestion"
+        ],
+        "x-samchon-controller": "QuestionController"
+      }
+    },
+    "/question/{id}": {
+      "put": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateQuestionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "updateQuestion"
+        ],
+        "x-samchon-controller": "QuestionController"
+      },
+      "delete": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteQuestionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "deleteQuestion"
+        ],
+        "x-samchon-controller": "QuestionController"
+      }
+    },
+    "/question/{id}/lock": {
+      "patch": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockQuestionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "lock",
+          "lockQuestionUpdate"
+        ],
+        "x-samchon-controller": "QuestionController"
+      }
+    },
+    "/question/filters": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionFiltersResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "filters",
+          "getQuestionFilters"
+        ],
+        "x-samchon-controller": "QuestionController"
       }
     }
   },
@@ -1980,120 +2175,7 @@
           "questions": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "question": {
-                  "type": "string"
-                },
-                "isDeleted": {
-                  "type": "boolean"
-                },
-                "createdAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "updatedAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "aiRephrasedQuestion": {
-                  "oneOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ]
-                },
-                "approvedQuestion": {
-                  "type": "string"
-                },
-                "intakeId": {
-                  "type": "string"
-                },
-                "categoryIds": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "explanation": {
-                  "type": "string"
-                },
-                "year": {
-                  "type": "string"
-                },
-                "correctAnswer": {
-                  "type": "string"
-                },
-                "options": {
-                  "oneOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    },
-                    {
-                      "$ref": "#/components/schemas/JsonArray"
-                    },
-                    {
-                      "$ref": "#/components/schemas/JsonObject"
-                    }
-                  ]
-                },
-                "sourceFile": {
-                  "oneOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ]
-                },
-                "lastUpdatedBy": {
-                  "oneOf": [
-                    {
-                      "type": "null"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ]
-                },
-                "isQuestionUpdateLocked": {
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "id",
-                "question",
-                "isDeleted",
-                "createdAt",
-                "updatedAt",
-                "aiRephrasedQuestion",
-                "approvedQuestion",
-                "intakeId",
-                "categoryIds",
-                "explanation",
-                "year",
-                "correctAnswer",
-                "options",
-                "sourceFile",
-                "lastUpdatedBy",
-                "isQuestionUpdateLocked"
-              ]
+              "$ref": "#/components/schemas/QuestionResponse"
             }
           },
           "totalCount": {
@@ -2111,6 +2193,122 @@
           "totalCount",
           "totalPages",
           "currentPage"
+        ]
+      },
+      "QuestionResponse": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "aiRephrasedQuestion": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "mainQuestion": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "$ref": "#/components/schemas/JsonArray"
+              },
+              {
+                "$ref": "#/components/schemas/JsonObject"
+              }
+            ]
+          },
+          "sourceFile": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "isQuestionUpdateLocked": {
+            "type": "boolean"
+          },
+          "intake": {
+            "$ref": "#/components/schemas/Pick__typeiddisplayName"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pick__typeiddisplayName.o1"
+            }
+          }
+        },
+        "required": [
+          "description",
+          "id",
+          "question",
+          "isDeleted",
+          "createdAt",
+          "updatedAt",
+          "aiRephrasedQuestion",
+          "mainQuestion",
+          "explanation",
+          "year",
+          "correctAnswer",
+          "options",
+          "sourceFile",
+          "isQuestionUpdateLocked",
+          "intake",
+          "categories"
         ]
       },
       "JsonArray": {
@@ -2166,6 +2364,38 @@
           ]
         }
       },
+      "Pick__typeiddisplayName": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "displayName"
+        ],
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
+      "Pick__typeiddisplayName.o1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "displayName"
+        ],
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
       "GetAllQuestionsQueryDto": {
         "type": "object",
         "properties": {
@@ -2195,6 +2425,197 @@
           }
         },
         "required": []
+      },
+      "CreateQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "CreateQuestionDto": {
+        "type": "object",
+        "properties": {
+          "mainQuestion": {
+            "type": "string"
+          },
+          "intake": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/Recordstringstring"
+          },
+          "sourceFile": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mainQuestion",
+          "intake",
+          "categories",
+          "year",
+          "correctAnswer",
+          "options"
+        ]
+      },
+      "Recordstringstring": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "Construct a type with a set of properties K of type T",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "UpdateQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "UpdateQuestionDto": {
+        "type": "object",
+        "properties": {
+          "mainQuestion": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "intake": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/Recordstringstring"
+          },
+          "sourceFile": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "DeleteQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "LockQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "QuestionFiltersResponse": {
+        "type": "object",
+        "properties": {
+          "intakes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "displayName"
+              ]
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "displayName"
+              ]
+            }
+          },
+          "years": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceFiles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "intakes",
+          "categories",
+          "years",
+          "sourceFiles"
+        ]
       }
     },
     "securitySchemes": {
