@@ -31,7 +31,7 @@ const setupSwagger = async (app: INestApplication, config: ConfigService) => {
         url: `http://localhost:${config.port}`,
       },
       {
-        url: `https://api.mrcs-mock.com`,
+        url: 'https://mrcs-exam-backend-production.up.railway.app',
         description: 'Production',
       },
     ],
