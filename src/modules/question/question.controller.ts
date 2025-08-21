@@ -1,7 +1,7 @@
 import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
 import { Controller, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { User, UserName } from 'src/common/decorators/user.decorators';
+import { UserName } from 'src/common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import {
@@ -30,7 +30,7 @@ export class QuestionController {
 
   @TypedRoute.Post()
   async createQuestion(
-    @User() UserName: string,
+    @UserName() UserName: string,
     @TypedBody() data: CreateQuestionDto,
   ) {
     return await this.questionService.createQuestion({
@@ -41,7 +41,7 @@ export class QuestionController {
 
   @TypedRoute.Put(':id')
   async updateQuestion(
-    @User() UserName: string,
+    @UserName() UserName: string,
     @TypedParam('id') id: string,
     @TypedBody() data: UpdateQuestionDto,
   ) {
