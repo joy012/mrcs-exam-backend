@@ -1,9 +1,9 @@
 export interface GetAllQuestionsQueryDto {
   page?: number;
   limit?: number;
-  year?: number;
-  intakeId?: string;
-  categoryIds?: string[];
+  year?: string;
+  intake?: string;
+  categories?: string[];
   search?: string;
   sourceFile?: string;
 }

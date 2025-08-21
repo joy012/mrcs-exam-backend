@@ -30,8 +30,8 @@ export class QuestionService {
       page = 1,
       limit = 20,
       year,
-      intakeId,
-      categoryIds: queryCategoryIds,
+      intake,
+      categories,
       search,
       sourceFile,
     } = query;
@@ -43,9 +43,9 @@ export class QuestionService {
     };
 
     if (year) where.year = year;
-    if (intakeId) where.intakeId = intakeId;
-    if (queryCategoryIds && queryCategoryIds.length > 0) {
-      where.categoryIds = { hasSome: queryCategoryIds };
+    if (intake) where.intake = intake;
+    if (categories && categories.length > 0) {
+      where.categories = { hasSome: categories };
     }
     if (sourceFile) where.sourceFile = sourceFile;
     if (search) {
@@ -77,7 +77,7 @@ export class QuestionService {
     const categoryIds = [...new Set(questions.flatMap((q) => q.categories))];
 
     // Fetch related data in parallel
-    const [intakes, categories] = await Promise.all([
+    const [questionIntake, questionCategories] = await Promise.all([
       this.prisma.examIntake.findMany({
         where: { id: { in: intakeIds } },
         select: {
@@ -95,8 +95,8 @@ export class QuestionService {
     ]);
 
     // Create lookup maps
-    const intakeMap = new Map(intakes.map((i) => [i.id, i]));
-    const categoryMap = new Map(categories.map((c) => [c.id, c]));
+    const intakeMap = new Map(questionIntake.map((i) => [i.id, i]));
+    const categoryMap = new Map(questionCategories.map((c) => [c.id, c]));
 
     // Map questions with related data
     const mappedQuestions = questions.map((question) => ({
