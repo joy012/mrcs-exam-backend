@@ -1629,6 +1629,170 @@
         "x-samchon-controller": "QuestionController"
       }
     },
+    "/question/details/{id}": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "isDeleted": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "aiRephrasedQuestion": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "mainQuestion": {
+                      "type": "string"
+                    },
+                    "intake": {
+                      "type": "string"
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "explanation": {
+                      "type": "string"
+                    },
+                    "year": {
+                      "type": "string"
+                    },
+                    "correctAnswer": {
+                      "type": "string"
+                    },
+                    "options": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/components/schemas/JsonArray"
+                        },
+                        {
+                          "$ref": "#/components/schemas/JsonObject"
+                        }
+                      ]
+                    },
+                    "sourceFile": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "isQuestionUpdateLocked": {
+                      "type": "boolean"
+                    },
+                    "lastUpdatedBy": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "id",
+                    "question",
+                    "isDeleted",
+                    "createdAt",
+                    "updatedAt",
+                    "aiRephrasedQuestion",
+                    "mainQuestion",
+                    "intake",
+                    "categories",
+                    "explanation",
+                    "year",
+                    "correctAnswer",
+                    "options",
+                    "sourceFile",
+                    "isQuestionUpdateLocked",
+                    "lastUpdatedBy"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question",
+          "details",
+          "getQuestion"
+        ],
+        "x-samchon-controller": "QuestionController"
+      }
+    },
     "/question/{id}": {
       "put": {
         "tags": [
@@ -2326,16 +2490,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "lastUpdatedBy": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "string"
-              }
-            ]
-          },
           "aiRephrasedQuestion": {
             "oneOf": [
               {
@@ -2393,6 +2547,16 @@
           "isQuestionUpdateLocked": {
             "type": "boolean"
           },
+          "lastUpdatedBy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
           "intake": {
             "$ref": "#/components/schemas/Pick__typeiddisplayName"
           },
@@ -2410,7 +2574,6 @@
           "isDeleted",
           "createdAt",
           "updatedAt",
-          "lastUpdatedBy",
           "aiRephrasedQuestion",
           "mainQuestion",
           "explanation",
@@ -2419,6 +2582,7 @@
           "options",
           "sourceFile",
           "isQuestionUpdateLocked",
+          "lastUpdatedBy",
           "intake",
           "categories"
         ]

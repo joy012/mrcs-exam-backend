@@ -23,6 +23,11 @@ export class QuestionController {
     return await this.questionService.getAllQuestions(query);
   }
 
+  @TypedRoute.Get('details/:id')
+  async getQuestion(@TypedParam('id') id: string) {
+    return await this.questionService.getQuestionById(id);
+  }
+
   @TypedRoute.Post()
   async createQuestion(
     @User() UserName: string,
