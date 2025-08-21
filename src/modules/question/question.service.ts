@@ -242,7 +242,10 @@ export class QuestionService {
     return { message: 'Question deleted successfully' };
   }
 
-  async lockQuestionUpdate(id: string): Promise<LockQuestionResponse> {
+  async toggleLockQuestion(
+    id: string,
+    updatedBy: string,
+  ): Promise<LockQuestionResponse> {
     const question = await this.prisma.question.findUnique({
       where: { id, isDeleted: false },
     });
@@ -251,13 +254,12 @@ export class QuestionService {
       throw new NotFoundException('Question not found');
     }
 
-    if (question.isQuestionUpdateLocked) {
-      throw new BadRequestException('Question is already locked');
-    }
-
     await this.prisma.question.update({
       where: { id },
-      data: { isQuestionUpdateLocked: true },
+      data: {
+        isQuestionUpdateLocked: !question.isQuestionUpdateLocked,
+        lastUpdatedBy: updatedBy,
+      },
     });
 
     return {

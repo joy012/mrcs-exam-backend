@@ -1,7 +1,7 @@
 import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
 import { Controller, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { User } from 'src/common/decorators/user.decorators';
+import { User, UserName } from 'src/common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import {
@@ -51,9 +51,12 @@ export class QuestionController {
     return await this.questionService.deleteQuestion(id);
   }
 
-  @TypedRoute.Patch(':id/lock')
-  async lockQuestionUpdate(@TypedParam('id') id: string) {
-    return await this.questionService.lockQuestionUpdate(id);
+  @TypedRoute.Patch(':id/toggle-lock')
+  async toggleLockQuestion(
+    @UserName() userName: string,
+    @TypedParam('id') id: string,
+  ) {
+    return await this.questionService.toggleLockQuestion(id, userName);
   }
 
   @TypedRoute.Get('filters')

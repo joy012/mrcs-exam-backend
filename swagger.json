@@ -1677,7 +1677,7 @@
         "x-samchon-controller": "QuestionController"
       }
     },
-    "/question/{id}/lock": {
+    "/question/{id}/toggle-lock": {
       "patch": {
         "tags": [
           "Question"
@@ -1711,8 +1711,8 @@
         ],
         "x-samchon-accessor": [
           "question",
-          "lock",
-          "lockQuestionUpdate"
+          "toggle_lock",
+          "toggleLockQuestion"
         ],
         "x-samchon-controller": "QuestionController"
       }
