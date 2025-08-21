@@ -1,11 +1,56 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { User, UserRole } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
+import { ConfigService } from '../../libs/config/config.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';
-import { UpdateUserDto, UserResponse } from './dto';
+import { CreateUserDto, UpdateUserDto, UserResponse } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
+
+  private async hashPassword(plain: string): Promise<string> {
+    const salt = await bcrypt.genSalt(this.config.bcryptRounds);
+    return bcrypt.hash(plain, salt);
+  }
+
+  async createUser(payload: CreateUserDto): Promise<string> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    const hashedPassword = await this.hashPassword(payload.password);
+
+    await this.prisma.user.create({
+      data: {
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        role: payload.role || UserRole.student,
+        medicalCollegeName: payload.medicalCollegeName,
+        email: payload.email,
+        phone: payload.phone,
+        mmbsPassingYear: payload.mmbsPassingYear,
+        password: hashedPassword,
+        avatarURL: payload.avatarURL || null,
+        isEmailVerified: true,
+        isProfileCompleted: true,
+        isDeleted: false,
+      },
+    });
+
+    return 'User created successfully';
+  }
 
   private mapUserToResponse(user: User): UserResponse {
     return {

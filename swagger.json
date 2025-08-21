@@ -431,6 +431,77 @@
         "x-samchon-controller": "AuthController"
       }
     },
+    "/user": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "createUser"
+        ],
+        "x-samchon-controller": "UserController"
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "getAllUsers"
+        ],
+        "x-samchon-controller": "UserController"
+      }
+    },
     "/user/me": {
       "get": {
         "tags": [
@@ -497,39 +568,6 @@
           "user",
           "me",
           "updateMe"
-        ],
-        "x-samchon-controller": "UserController"
-      }
-    },
-    "/user": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserResponse"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "x-samchon-accessor": [
-          "user",
-          "getAllUsers"
         ],
         "x-samchon-controller": "UserController"
       }
@@ -2084,6 +2122,69 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Last name"
+          },
+          "role": {
+            "oneOf": [
+              {
+                "const": "admin"
+              },
+              {
+                "const": "student"
+              }
+            ],
+            "description": "Role, defaults to student"
+          },
+          "medicalCollegeName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Medical college name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9]{7,15}$",
+            "description": "Phone number"
+          },
+          "mmbsPassingYear": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "MBBS passing year"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Password (min 8 chars)"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "Avatar URL"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "role",
+          "medicalCollegeName",
+          "email",
+          "password"
         ]
       },
       "UpdateUserDto": {

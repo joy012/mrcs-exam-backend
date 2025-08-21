@@ -4,7 +4,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserId } from 'src/common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
-import { UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
@@ -13,6 +13,12 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseGuards(RoleGuard('admin'))
+  @TypedRoute.Post()
+  async createUser(@TypedBody() body: CreateUserDto) {
+    return await this.userService.createUser(body);
+  }
 
   @TypedRoute.Get('me')
   async getMe(@UserId() userId: string) {
