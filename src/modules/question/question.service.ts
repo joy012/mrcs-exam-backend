@@ -116,7 +116,7 @@ export class QuestionService {
   }
 
   async createQuestion(
-    data: CreateQuestionDto,
+    data: CreateQuestionDto & { createdBy: string },
   ): Promise<CreateQuestionResponse> {
     // Validate intake exists
     const intake = await this.prisma.examIntake.findUnique({
@@ -151,6 +151,7 @@ export class QuestionService {
         correctAnswer: data.correctAnswer,
         options: data.options,
         sourceFile: data.sourceFile,
+        lastUpdatedBy: data.createdBy,
       },
     });
 
@@ -159,7 +160,7 @@ export class QuestionService {
 
   async updateQuestion(
     id: string,
-    data: UpdateQuestionDto,
+    data: UpdateQuestionDto & { lastUpdatedBy: string },
   ): Promise<UpdateQuestionResponse> {
     // Check if question exists and is not locked
     const existingQuestion = await this.prisma.question.findUnique({
@@ -216,6 +217,7 @@ export class QuestionService {
         ...(data.correctAnswer && { correctAnswer: data.correctAnswer }),
         ...(data.options && { options: data.options }),
         ...(data.sourceFile !== undefined && { sourceFile: data.sourceFile }),
+        ...(data.lastUpdatedBy && { lastUpdatedBy: data.lastUpdatedBy }),
       },
     });
 

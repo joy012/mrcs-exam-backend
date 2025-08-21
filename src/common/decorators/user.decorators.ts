@@ -36,6 +36,20 @@ export const UserRole = createParamDecorator(
   },
 );
 
+export const UserName = createParamDecorator(
+  (_, ctx: ExecutionContext): string => {
+    const request = ctx.switchToHttp().getRequest();
+
+    if (!request.user) {
+      throw new Error(
+        'User not found in request. Make sure JWT guard is applied.',
+      );
+    }
+
+    return `${(request.user as UserResponse).firstName} ${(request.user as UserResponse).lastName}`;
+  },
+);
+
 export const AccessToken = createParamDecorator(
   (_, ctx: ExecutionContext): string => {
     const request = ctx.switchToHttp().getRequest();

@@ -1489,12 +1489,12 @@
             "name": "year",
             "in": "query",
             "schema": {
-              "type": "number"
+              "type": "string"
             },
             "required": false
           },
           {
-            "name": "intakeId",
+            "name": "intake",
             "in": "query",
             "schema": {
               "type": "string"
@@ -1502,7 +1502,7 @@
             "required": false
           },
           {
-            "name": "categoryIds",
+            "name": "categories",
             "in": "query",
             "schema": {
               "type": "array",
@@ -2225,6 +2225,16 @@
             "type": "string",
             "format": "date-time"
           },
+          "lastUpdatedBy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
           "aiRephrasedQuestion": {
             "oneOf": [
               {
@@ -2299,6 +2309,7 @@
           "isDeleted",
           "createdAt",
           "updatedAt",
+          "lastUpdatedBy",
           "aiRephrasedQuestion",
           "mainQuestion",
           "explanation",
@@ -2406,12 +2417,12 @@
             "type": "number"
           },
           "year": {
-            "type": "number"
-          },
-          "intakeId": {
             "type": "string"
           },
-          "categoryIds": {
+          "intake": {
+            "type": "string"
+          },
+          "categories": {
             "type": "array",
             "items": {
               "type": "string"
