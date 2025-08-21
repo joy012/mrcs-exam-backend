@@ -6,6 +6,8 @@ export interface GetAllQuestionsQueryDto {
   categories?: string[];
   search?: string;
   sourceFile?: string;
+  lastUpdatedBy?: string;
+  status?: 'locked' | 'unlocked' | 'all';
 }
 
 export interface CreateQuestionDto {
@@ -18,6 +20,7 @@ export interface CreateQuestionDto {
   correctAnswer: string;
   options: Record<string, string>;
   sourceFile?: string;
+  isQuestionUpdateLocked?: boolean;
 }
 
 export interface UpdateQuestionDto {
@@ -30,6 +33,7 @@ export interface UpdateQuestionDto {
   correctAnswer?: string;
   options?: Record<string, string>;
   sourceFile?: string;
+  isQuestionUpdateLocked?: boolean;
 }
 
 export interface QuestionFiltersResponse {
@@ -37,4 +41,5 @@ export interface QuestionFiltersResponse {
   categories: Array<{ id: string; displayName: string }>;
   years: string[];
   sourceFiles: string[];
+  lastUpdatedBy: string[];
 }

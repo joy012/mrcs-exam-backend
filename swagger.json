@@ -1565,6 +1565,32 @@
               "type": "string"
             },
             "required": false
+          },
+          {
+            "name": "lastUpdatedBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "oneOf": [
+                {
+                  "const": "all"
+                },
+                {
+                  "const": "locked"
+                },
+                {
+                  "const": "unlocked"
+                }
+              ]
+            },
+            "required": false
           }
         ],
         "responses": {
@@ -2698,6 +2724,22 @@
           },
           "sourceFile": {
             "type": "string"
+          },
+          "lastUpdatedBy": {
+            "type": "string"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "const": "all"
+              },
+              {
+                "const": "locked"
+              },
+              {
+                "const": "unlocked"
+              }
+            ]
           }
         },
         "required": []
@@ -2745,6 +2787,9 @@
           },
           "sourceFile": {
             "type": "string"
+          },
+          "isQuestionUpdateLocked": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2808,6 +2853,9 @@
           },
           "sourceFile": {
             "type": "string"
+          },
+          "isQuestionUpdateLocked": {
+            "type": "boolean"
           }
         },
         "required": []
@@ -2884,13 +2932,20 @@
             "items": {
               "type": "string"
             }
+          },
+          "lastUpdatedBy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
           "intakes",
           "categories",
           "years",
-          "sourceFiles"
+          "sourceFiles",
+          "lastUpdatedBy"
         ]
       }
     },

@@ -34,6 +34,8 @@ export class QuestionService {
       categories,
       search,
       sourceFile,
+      lastUpdatedBy,
+      status,
     } = query;
 
     const skip = (page - 1) * limit;
@@ -48,6 +50,10 @@ export class QuestionService {
       where.categories = { hasSome: categories };
     }
     if (sourceFile) where.sourceFile = sourceFile;
+    if (lastUpdatedBy) where.lastUpdatedBy = lastUpdatedBy;
+    if (status && status !== 'all') {
+      where.isQuestionUpdateLocked = status === 'locked';
+    }
     if (search) {
       where.mainQuestion = { contains: search, mode: 'insensitive' };
     }
@@ -152,6 +158,7 @@ export class QuestionService {
         options: data.options,
         sourceFile: data.sourceFile,
         lastUpdatedBy: data.createdBy,
+        isQuestionUpdateLocked: data.isQuestionUpdateLocked || false,
       },
     });
 
@@ -218,6 +225,9 @@ export class QuestionService {
         ...(data.options && { options: data.options }),
         ...(data.sourceFile !== undefined && { sourceFile: data.sourceFile }),
         ...(data.lastUpdatedBy && { lastUpdatedBy: data.lastUpdatedBy }),
+        ...(data.isQuestionUpdateLocked !== undefined && {
+          isQuestionUpdateLocked: data.isQuestionUpdateLocked,
+        }),
       },
     });
 
@@ -282,14 +292,14 @@ export class QuestionService {
         select: { id: true, displayName: true },
         orderBy: [{ type: 'asc' }, { displayName: 'asc' }],
       }),
-      // Get unique years and source files from questions
+      // Get unique years, source files, and lastUpdatedBy from questions
       this.prisma.question.findMany({
         where: { isDeleted: false },
-        select: { year: true, sourceFile: true },
+        select: { year: true, sourceFile: true, lastUpdatedBy: true },
       }),
     ]);
 
-    // Extract unique years and source files
+    // Extract unique years, source files, and lastUpdatedBy
     const uniqueYears = [
       ...new Set(yearsAndSourceFiles.map((q) => q.year)),
     ].sort();
@@ -302,12 +312,22 @@ export class QuestionService {
           ),
       ),
     ].sort();
+    const uniqueLastUpdatedBy = [
+      ...new Set(
+        yearsAndSourceFiles
+          .map((q) => q.lastUpdatedBy)
+          .filter(
+            (user): user is string => user !== null && user !== undefined,
+          ),
+      ),
+    ].sort();
 
     return {
       intakes,
       categories,
       years: uniqueYears,
       sourceFiles: uniqueSourceFiles,
+      lastUpdatedBy: uniqueLastUpdatedBy,
     };
   }
 
