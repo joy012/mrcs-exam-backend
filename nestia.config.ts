@@ -15,8 +15,8 @@ const config: INestiaConfig = {
       },
     },
     info: {
-      title: 'MRCS Exam Backend',
-      description: 'MRCS Exam API',
+      title: 'Zero To MRCS Backend',
+      description: 'Zero To MRCS API',
       version: '1.0.0',
     },
     beautify: true,

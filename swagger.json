@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "servers": [],
   "info": {
-    "title": "MRCS Exam Backend",
-    "description": "MRCS Exam API",
+    "title": "Zero To MRCS Backend",
+    "description": "Zero To MRCS API",
     "version": "1.0.0",
     "license": {
       "name": "UNLICENSED"
