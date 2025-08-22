@@ -124,6 +124,15 @@ export class QuestionService {
   async createQuestion(
     data: CreateQuestionDto & { createdBy: string },
   ): Promise<CreateQuestionResponse> {
+    // check if question title already exists
+    const existingQuestion = await this.prisma.question.findFirst({
+      where: { mainQuestion: data.mainQuestion },
+    });
+
+    if (existingQuestion) {
+      throw new BadRequestException('Question with this title already exists');
+    }
+
     // Validate intake exists
     const intake = await this.prisma.examIntake.findUnique({
       where: { id: data.intake },
@@ -180,6 +189,18 @@ export class QuestionService {
 
     if (existingQuestion.isQuestionUpdateLocked) {
       throw new BadRequestException('Question is locked and cannot be updated');
+    }
+
+    if (data.mainQuestion) {
+      const existingQuestion = await this.prisma.question.findFirst({
+        where: { mainQuestion: data.mainQuestion },
+      });
+
+      if (existingQuestion) {
+        throw new BadRequestException(
+          'Question with this title already exists',
+        );
+      }
     }
 
     // Validate intake if provided
