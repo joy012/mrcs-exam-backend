@@ -112,6 +112,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "packageManager": "pnpm@10.13.1"
+  }
 }
