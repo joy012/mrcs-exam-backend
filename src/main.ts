@@ -13,8 +13,8 @@ const logger = new Logger('Bootstrap');
 const setupSwagger = async (app: INestApplication, config: ConfigService) => {
   const document = await NestiaSwaggerComposer.document(app, {
     info: {
-      title: 'MRCS Mock Exam Backend',
-      description: 'MRCS Mock Exam Backend API',
+      title: 'Zero To MRCS Backend',
+      description: 'Zero To MRCS API',
       version: '1.0.0',
     },
     security: {
@@ -49,7 +49,7 @@ const setupSwagger = async (app: INestApplication, config: ConfigService) => {
       defaultModelExpandDepth: 8,
       defaultModelsExpandDepth: 8,
     },
-    customSiteTitle: 'MRCS Mock Exam Backend',
+    customSiteTitle: 'Zero To MRCS Backend',
   });
 
   return document;
