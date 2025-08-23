@@ -393,6 +393,129 @@
         "x-samchon-controller": "AuthController"
       }
     },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "logout",
+          "logout"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/logout/{sessionId}": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "logout",
+          "logoutSession"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/session": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "session",
+          "createSession"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
+    "/auth/terminate-all-sessions": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerminateAllSessionsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-samchon-accessor": [
+          "auth",
+          "terminate_all_sessions",
+          "terminateAllSessions"
+        ],
+        "x-samchon-controller": "AuthController"
+      }
+    },
     "/auth/test-email": {
       "get": {
         "tags": [
@@ -1705,6 +1828,28 @@
                       "type": "string",
                       "format": "date-time"
                     },
+                    "options": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/components/schemas/JsonArray"
+                        },
+                        {
+                          "$ref": "#/components/schemas/JsonObject"
+                        }
+                      ]
+                    },
                     "aiRephrasedQuestion": {
                       "oneOf": [
                         {
@@ -1735,28 +1880,6 @@
                     },
                     "correctAnswer": {
                       "type": "string"
-                    },
-                    "options": {
-                      "oneOf": [
-                        {
-                          "type": "null"
-                        },
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        },
-                        {
-                          "$ref": "#/components/schemas/JsonArray"
-                        },
-                        {
-                          "$ref": "#/components/schemas/JsonObject"
-                        }
-                      ]
                     },
                     "sourceFile": {
                       "oneOf": [
@@ -1789,6 +1912,7 @@
                     "isDeleted",
                     "createdAt",
                     "updatedAt",
+                    "options",
                     "aiRephrasedQuestion",
                     "mainQuestion",
                     "intake",
@@ -1796,7 +1920,6 @@
                     "explanation",
                     "year",
                     "correctAnswer",
-                    "options",
                     "sourceFile",
                     "isQuestionUpdateLocked",
                     "lastUpdatedBy"
@@ -2169,12 +2292,62 @@
           },
           "user": {
             "$ref": "#/components/schemas/UserResponse"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionResponse"
+            }
           }
         },
         "required": [
           "accessToken",
           "refreshToken",
-          "user"
+          "user",
+          "sessions"
+        ]
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          },
+          "ipAddress": {
+            "type": "string"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "const": "ACTIVE"
+              },
+              {
+                "const": "TERMINATED"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "lastSeenAt": {
+            "type": "string"
+          },
+          "revokedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "deviceName",
+          "status",
+          "createdAt",
+          "lastSeenAt"
         ]
       },
       "AuthLoginDto": {
@@ -2189,11 +2362,36 @@
             "type": "string",
             "minLength": 8,
             "description": "Password"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionInfoDto",
+            "description": "Session info for this login attempt"
           }
         },
         "required": [
           "email",
           "password"
+        ]
+      },
+      "SessionInfoDto": {
+        "type": "object",
+        "properties": {
+          "deviceName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human friendly device name, e.g. \"MacBook Pro - Chrome\""
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "Full user agent string"
+          },
+          "ipAddress": {
+            "type": "string",
+            "description": "Optional public IP detected client-side; server may override from request"
+          }
+        },
+        "required": [
+          "deviceName"
         ]
       },
       "AuthVerifyEmailResponse": {
@@ -2212,12 +2410,19 @@
           "user": {
             "$ref": "#/components/schemas/UserResponse",
             "description": "User data"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionResponse"
+            }
           }
         },
         "required": [
           "accessToken",
           "refreshToken",
-          "user"
+          "user",
+          "sessions"
         ]
       },
       "AuthVerifyEmailDto": {
@@ -2232,6 +2437,10 @@
             "type": "string",
             "minLength": 16,
             "description": "Verification token"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionInfoDto",
+            "description": "Session info to establish after verification"
           }
         },
         "required": [
@@ -2312,6 +2521,62 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "CreateSessionResponse": {
+        "type": "object",
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/SessionResponse"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionResponse"
+            }
+          }
+        },
+        "required": [
+          "session",
+          "sessions"
+        ]
+      },
+      "CreateSessionDto": {
+        "type": "object",
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/SessionInfoDto"
+          }
+        },
+        "required": [
+          "session"
+        ],
+        "description": "Create a session for already logged-in users with no active session"
+      },
+      "TerminateAllSessionsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "terminatedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "message",
+          "terminatedCount"
         ]
       },
       "CreateUserDto": {
@@ -2516,28 +2781,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "aiRephrasedQuestion": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "string"
-              }
-            ]
-          },
-          "mainQuestion": {
-            "type": "string"
-          },
-          "explanation": {
-            "type": "string"
-          },
-          "year": {
-            "type": "string"
-          },
-          "correctAnswer": {
-            "type": "string"
-          },
           "options": {
             "oneOf": [
               {
@@ -2559,6 +2802,28 @@
                 "$ref": "#/components/schemas/JsonObject"
               }
             ]
+          },
+          "aiRephrasedQuestion": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "mainQuestion": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "correctAnswer": {
+            "type": "string"
           },
           "sourceFile": {
             "oneOf": [
@@ -2600,12 +2865,12 @@
           "isDeleted",
           "createdAt",
           "updatedAt",
+          "options",
           "aiRephrasedQuestion",
           "mainQuestion",
           "explanation",
           "year",
           "correctAnswer",
-          "options",
           "sourceFile",
           "isQuestionUpdateLocked",
           "lastUpdatedBy",

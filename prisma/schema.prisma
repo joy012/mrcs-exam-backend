@@ -29,6 +29,11 @@ enum QuestionCategoryType {
   CLINICAL
 }
 
+enum SessionStatus {
+  ACTIVE
+  TERMINATED
+}
+
 model User {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName          String
@@ -85,4 +90,21 @@ model Question {
   updatedAt              DateTime @updatedAt
   isQuestionUpdateLocked Boolean  @default(false)
   lastUpdatedBy          String?
+}
+
+/// Tracks authenticated user sessions. Only one active session per user is allowed at a time (enforced in service logic).
+model Session {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String        @db.ObjectId
+  deviceName String
+  userAgent  String?
+  ipAddress  String?
+  status     SessionStatus @default(ACTIVE)
+  createdAt  DateTime      @default(now())
+  lastSeenAt DateTime      @default(now())
+  revokedAt  DateTime?
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([userId, revokedAt])
 }

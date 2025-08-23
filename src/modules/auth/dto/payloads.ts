@@ -1,5 +1,14 @@
 import { tags } from 'typia';
 
+export interface SessionInfoDto {
+  /** Human friendly device name, e.g. "MacBook Pro - Chrome" */
+  deviceName: string & tags.MinLength<1>;
+  /** Full user agent string */
+  userAgent?: string;
+  /** Optional public IP detected client-side; server may override from request */
+  ipAddress?: string;
+}
+
 export interface AuthSignupDto {
   /** Email */
   email: string & tags.Format<'email'>;
@@ -19,7 +28,7 @@ export interface AuthCompleteProfileDto {
   medicalCollegeName: string & tags.MinLength<1>;
 
   /** E.164-ish phone, 7-15 digits, optional leading + */
-  phone?: string & tags.Pattern<'^[+]?[0-9]{7,15}$'>;
+  phone?: string;
 
   /** MBBS passing year */
   mmbsPassingYear?: number & tags.Minimum<1950> & tags.Maximum<2100>;
@@ -36,6 +45,8 @@ export interface AuthLoginDto {
   email: string & tags.Format<'email'>;
   /** Password */
   password: string & tags.MinLength<8>;
+  /** Session info for this login attempt */
+  session?: SessionInfoDto;
 }
 
 export interface AuthVerifyEmailDto {
@@ -43,6 +54,8 @@ export interface AuthVerifyEmailDto {
   email: string & tags.Format<'email'>;
   /** Verification token */
   token: string & tags.MinLength<16>;
+  /** Session info to establish after verification */
+  session?: SessionInfoDto;
 }
 
 export interface AuthSendForgotPasswordDto {
@@ -71,4 +84,9 @@ export interface AuthResendVerificationEmailDto {
 export interface AuthResendForgotPasswordEmailDto {
   /** Email */
   email: string & tags.Format<'email'>;
+}
+
+/** Create a session for already logged-in users with no active session */
+export interface CreateSessionDto {
+  session: SessionInfoDto;
 }

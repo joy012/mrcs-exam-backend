@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User, UserRole } from '@prisma/client';
+import { SessionStatus, User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { CustomJwtService } from 'src/libs/jwt/jwt.service';
 import { ConfigService } from '../../libs/config/config.service';
@@ -23,6 +23,11 @@ import {
   AuthSignupResponse,
   AuthVerifyEmailDto,
   AuthVerifyEmailResponse,
+  CreateSessionResponse,
+  LogoutResponse,
+  SessionInfoDto,
+  SessionResponse,
+  TerminateAllSessionsResponse,
 } from './dto';
 
 @Injectable()
@@ -59,6 +64,178 @@ export class AuthService {
       phone: user.phone,
       isDeleted: user.isDeleted,
       isProfileCompleted: user.isProfileCompleted,
+    };
+  }
+
+  private mapSessionToResponse(session: any): SessionResponse {
+    return {
+      id: session.id,
+      deviceName: session.deviceName,
+      userAgent: session.userAgent,
+      ipAddress: session.ipAddress,
+      status: session.status,
+      createdAt: session.createdAt.toISOString(),
+      lastSeenAt: session.lastSeenAt.toISOString(),
+      revokedAt: session.revokedAt?.toISOString(),
+    };
+  }
+
+  private async getUserSessions(userId: string): Promise<SessionResponse[]> {
+    const sessions = await this.prisma.session.findMany({
+      where: { userId },
+      orderBy: { lastSeenAt: 'desc' },
+    });
+
+    return sessions.map((session) => this.mapSessionToResponse(session));
+  }
+
+  private async createSession(
+    userId: string,
+    sessionInfo: SessionInfoDto,
+    ipAddress?: string,
+  ): Promise<SessionResponse> {
+    // Check if same device already exists (by deviceName AND userAgent) - regardless of status
+    const whereCondition = {
+      userId,
+      deviceName: sessionInfo.deviceName,
+      ...(sessionInfo.userAgent && { userAgent: sessionInfo.userAgent }),
+    };
+
+    const existingSession = await this.prisma.session.findFirst({
+      where: whereCondition,
+      orderBy: {
+        lastSeenAt: 'desc', // Get the most recent session for this device
+      },
+    });
+
+    if (existingSession) {
+      // Reactivate existing session (whether it was ACTIVE or TERMINATED)
+      const updatedSession = await this.prisma.session.update({
+        where: { id: existingSession.id },
+        data: {
+          userAgent: sessionInfo.userAgent,
+          ipAddress: ipAddress || sessionInfo.ipAddress,
+          lastSeenAt: new Date(),
+          status: 'ACTIVE',
+          revokedAt: null, // Clear the revoked timestamp
+        },
+      });
+      return this.mapSessionToResponse(updatedSession);
+    }
+
+    // Create new session only if no session exists for this device combination
+    const newSession = await this.prisma.session.create({
+      data: {
+        userId,
+        deviceName: sessionInfo.deviceName,
+        userAgent: sessionInfo.userAgent,
+        ipAddress: ipAddress || sessionInfo.ipAddress,
+        status: 'ACTIVE',
+      },
+    });
+
+    return this.mapSessionToResponse(newSession);
+  }
+
+  private async checkActiveSession(
+    userId: string,
+    status?: SessionStatus,
+    currentDeviceName?: string,
+    currentUserAgent?: string,
+  ): Promise<SessionResponse | null> {
+    const baseCondition = {
+      userId,
+      status: status || ('ACTIVE' as const), // Default to checking only ACTIVE sessions
+    };
+
+    // Build the where condition based on available parameters
+    let whereCondition: any = baseCondition;
+
+    // Exclude current device by both deviceName and userAgent if both are provided
+    if (currentDeviceName && currentUserAgent) {
+      whereCondition = {
+        ...baseCondition,
+        NOT: {
+          AND: [
+            { deviceName: currentDeviceName },
+            { userAgent: currentUserAgent },
+          ],
+        },
+      };
+    } else if (currentDeviceName) {
+      // Fallback to deviceName only if userAgent is not provided
+      whereCondition = {
+        ...baseCondition,
+        deviceName: { not: currentDeviceName },
+      };
+    } else if (currentUserAgent) {
+      // Fallback to userAgent only if deviceName is not provided
+      whereCondition = {
+        ...baseCondition,
+        userAgent: { not: currentUserAgent },
+      };
+    }
+
+    const activeSession = await this.prisma.session.findFirst({
+      where: whereCondition,
+    });
+
+    return activeSession ? this.mapSessionToResponse(activeSession) : null;
+  }
+
+  async terminateSession(userId: string, sessionId?: string): Promise<void> {
+    const whereClause = sessionId
+      ? { id: sessionId, userId }
+      : { userId, status: 'ACTIVE' as const };
+
+    await this.prisma.session.updateMany({
+      where: whereClause,
+      data: {
+        status: 'TERMINATED',
+        revokedAt: new Date(),
+      },
+    });
+  }
+
+  async terminateAllSessions(
+    userId: string,
+  ): Promise<TerminateAllSessionsResponse> {
+    const result = await this.prisma.session.updateMany({
+      where: {
+        userId,
+        status: 'ACTIVE',
+      },
+      data: {
+        status: 'TERMINATED',
+        revokedAt: new Date(),
+      },
+    });
+
+    return {
+      message: 'All sessions terminated successfully',
+      terminatedCount: result.count,
+    };
+  }
+
+  async createSessionForUser(
+    userId: string,
+    sessionInfo: SessionInfoDto,
+    ipAddress?: string,
+  ): Promise<CreateSessionResponse> {
+    // Check if user already has an active session
+    const activeSession = await this.checkActiveSession(userId);
+    if (activeSession) {
+      throw new BadRequestException(
+        `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+      );
+    }
+
+    const session = await this.createSession(userId, sessionInfo, ipAddress);
+    const allSessions = await this.getUserSessions(userId);
+
+    return {
+      session,
+      sessions: allSessions?.length > 0 ? allSessions : [session],
     };
   }
 
@@ -163,7 +340,10 @@ export class AuthService {
     return this.mapUserToResponse(updatedUser);
   }
 
-  async login(payload: AuthLoginDto): Promise<AuthLoginResponse> {
+  async login(
+    payload: AuthLoginDto,
+    ipAddress?: string,
+  ): Promise<AuthLoginResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: payload.email },
     });
@@ -188,20 +368,44 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Handle session management if session info provided
+    if (payload.session) {
+      // Check for active session on other devices
+      const activeSession = await this.checkActiveSession(
+        user.id,
+        'ACTIVE',
+        payload.session.deviceName,
+        payload.session.userAgent,
+      );
+      if (activeSession) {
+        throw new BadRequestException(
+          `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+        );
+      }
+
+      // Create or update session for this device
+      await this.createSession(user.id, payload.session, ipAddress);
+    }
+
     const { accessToken, refreshToken } = this.jwtService.generateTokens(
       user.id,
       user.role,
     );
 
+    // Get all user sessions
+    const sessions = await this.getUserSessions(user.id);
+
     return {
       accessToken,
       refreshToken,
       user: this.mapUserToResponse(user),
+      sessions,
     };
   }
 
   async verifyEmail(
     payload: AuthVerifyEmailDto,
+    ipAddress?: string,
   ): Promise<AuthVerifyEmailResponse> {
     let decoded: { email: string; purpose: 'verify' | 'reset' };
 
@@ -233,16 +437,39 @@ export class AuthService {
       data: { isEmailVerified: true },
     });
 
+    // Handle session management if session info provided
+    if (payload.session) {
+      // Check for active session on other devices
+      const activeSession = await this.checkActiveSession(
+        user.id,
+        'ACTIVE',
+        payload.session.deviceName,
+        payload.session.userAgent,
+      );
+      if (activeSession) {
+        throw new BadRequestException(
+          `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+        );
+      }
+
+      // Create session for this device
+      await this.createSession(user.id, payload.session, ipAddress);
+    }
+
     // Generate tokens for the verified user
     const { accessToken, refreshToken } = this.jwtService.generateTokens(
       user.id,
       user.role,
     );
 
+    // Get all user sessions
+    const sessions = await this.getUserSessions(user.id);
+
     return {
       accessToken,
       refreshToken,
       user: this.mapUserToResponse(user),
+      sessions,
     };
   }
 
@@ -363,5 +590,10 @@ export class AuthService {
     });
 
     return { message: 'Password reset email resent successfully' };
+  }
+
+  async logout(userId: string, sessionId?: string): Promise<LogoutResponse> {
+    await this.terminateSession(userId, sessionId);
+    return { message: 'Logged out successfully' };
   }
 }

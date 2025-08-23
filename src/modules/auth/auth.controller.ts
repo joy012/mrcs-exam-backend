@@ -1,6 +1,7 @@
-import { TypedBody, TypedRoute } from '@nestia/core';
-import { Controller, UseGuards } from '@nestjs/common';
+import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
+import { Controller, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { UserId } from '../../common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { EmailService } from '../../libs/email/email.service';
@@ -14,6 +15,7 @@ import {
   AuthSendForgotPasswordDto,
   AuthSignupDto,
   AuthVerifyEmailDto,
+  CreateSessionDto,
   RefreshTokenBody,
 } from './dto';
 
@@ -40,13 +42,18 @@ export class AuthController {
   }
 
   @TypedRoute.Post('login')
-  async login(@TypedBody() body: AuthLoginDto) {
-    return await this.authService.login(body);
+  async login(@TypedBody() body: AuthLoginDto, @Req() req: Request) {
+    const ipAddress = req.ip || req.connection.remoteAddress || '';
+    return await this.authService.login(body, ipAddress);
   }
 
   @TypedRoute.Post('verify-email')
-  async verifyEmail(@TypedBody() body: AuthVerifyEmailDto) {
-    return await this.authService.verifyEmail(body);
+  async verifyEmail(
+    @TypedBody() body: AuthVerifyEmailDto,
+    @Req() req: Request,
+  ) {
+    const ipAddress = req.ip || req.connection.remoteAddress || '';
+    return await this.authService.verifyEmail(body, ipAddress);
   }
 
   @TypedRoute.Post('forgot-password')
@@ -76,6 +83,42 @@ export class AuthController {
     @TypedBody() body: AuthResendForgotPasswordEmailDto,
   ) {
     return await this.authService.resendForgotPasswordEmail(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @TypedRoute.Post('logout')
+  async logout(@UserId() userId: string) {
+    return await this.authService.logout(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @TypedRoute.Post('logout/:sessionId')
+  async logoutSession(
+    @UserId() userId: string,
+    @TypedParam('sessionId') sessionId: string,
+  ) {
+    return await this.authService.logout(userId, sessionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @TypedRoute.Post('session')
+  async createSession(
+    @UserId() userId: string,
+    @TypedBody() body: CreateSessionDto,
+    @Req() req: Request,
+  ) {
+    const ipAddress = req.ip || req.connection.remoteAddress || '';
+    return await this.authService.createSessionForUser(
+      userId,
+      body.session,
+      ipAddress,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @TypedRoute.Post('terminate-all-sessions')
+  async terminateAllSessions(@UserId() userId: string) {
+    return await this.authService.terminateAllSessions(userId);
   }
 
   @TypedRoute.Get('test-email')
