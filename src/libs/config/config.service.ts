@@ -75,6 +75,17 @@ class BrandConfig {
   name = 'Zero To MRCS';
 }
 
+class CloudinaryConfig {
+  @Env('CLOUDINARY_CLOUD_NAME')
+  cloudName: string;
+
+  @Env('CLOUDINARY_API_KEY')
+  apiKey: string;
+
+  @Env('CLOUDINARY_API_SECRET')
+  apiSecret: string;
+}
+
 export class ConfigService {
   @Section(() => ServerConfig)
   server: ServerConfig;
@@ -96,6 +107,9 @@ export class ConfigService {
 
   @Section(() => BrandConfig)
   brand: BrandConfig;
+
+  @Section(() => CloudinaryConfig)
+  cloudinary: CloudinaryConfig;
 
   // Convenience getters for backward compatibility
   get port(): number {
@@ -178,6 +192,18 @@ export class ConfigService {
     return this.brand.name;
   }
 
+  get cloudinaryCloudName(): string {
+    return this.cloudinary.cloudName;
+  }
+
+  get cloudinaryApiKey(): string {
+    return this.cloudinary.apiKey;
+  }
+
+  get cloudinaryApiSecret(): string {
+    return this.cloudinary.apiSecret;
+  }
+
   // Get all configuration as a single object
   getAll() {
     return {
@@ -188,6 +214,7 @@ export class ConfigService {
       admin: this.admin,
       security: this.security,
       brand: this.brand,
+      cloudinary: this.cloudinary,
     };
   }
 }

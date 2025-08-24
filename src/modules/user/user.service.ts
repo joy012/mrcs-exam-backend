@@ -5,8 +5,10 @@ import {
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import * as sharp from 'sharp';
 import { ConfigService } from '../../libs/config/config.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';
+import { StorageService } from '../../libs/storage/storage.service';
 import { CreateUserDto, UpdateUserDto, UserResponse } from './dto';
 
 @Injectable()
@@ -14,6 +16,7 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly storageService: StorageService,
   ) {}
 
   private async hashPassword(plain: string): Promise<string> {
@@ -159,5 +162,28 @@ export class UserService {
     });
 
     return users.map((user) => this.mapUserToResponse(user));
+  }
+
+  async uploadAvatar(
+    avatar: Express.Multer.File,
+    userId: string,
+  ): Promise<UserResponse> {
+    const avatarFilename = `${userId}-${Date.now()}.webp`;
+    const sharpBuffer = await sharp(avatar.buffer)
+      .resize(200)
+      .webp({ nearLossless: true, quality: 90 })
+      .toBuffer();
+    const uploadedURL = await this.storageService.upload(
+      'images/avatars',
+      avatarFilename,
+      sharpBuffer,
+    );
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarURL: uploadedURL },
+    });
+
+    return this.mapUserToResponse(updatedUser);
   }
 }

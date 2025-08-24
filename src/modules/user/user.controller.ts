@@ -1,6 +1,7 @@
 import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiImageFile } from 'src/common/decorators/api-file.decorator';
 import { UserId } from 'src/common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
@@ -55,5 +56,14 @@ export class UserController {
   @TypedRoute.Delete(':id')
   async deleteUserByID(@TypedParam('id') id: string) {
     return await this.userService.deleteUserByID(id);
+  }
+
+  @Post('upload/avatar')
+  @ApiImageFile({ fieldName: 'avatar' })
+  uploadAvatar(
+    @UploadedFile() avatar: Express.Multer.File,
+    @UserId() userId: string,
+  ) {
+    return this.userService.uploadAvatar(avatar, userId);
   }
 }

@@ -826,6 +826,38 @@
         "x-samchon-controller": "UserController"
       }
     },
+    "/user/upload/avatar": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "user",
+          "upload",
+          "avatar",
+          "uploadAvatar"
+        ],
+        "x-samchon-controller": "UserController"
+      }
+    },
     "/exam-intake": {
       "get": {
         "tags": [
@@ -2251,7 +2283,6 @@
           },
           "phone": {
             "type": "string",
-            "pattern": "^[+]?[0-9]{7,15}$",
             "description": "E.164-ish phone, 7-15 digits, optional leading +"
           },
           "mmbsPassingYear": {
