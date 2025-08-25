@@ -80,7 +80,6 @@ model Question {
   intake                 String   @db.ObjectId
   categories             String[] @db.ObjectId
   explanation            String
-  description            String?
   year                   String
   correctAnswer          String
   options                Json

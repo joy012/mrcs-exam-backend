@@ -1833,16 +1833,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "description": {
-                      "oneOf": [
-                        {
-                          "type": "null"
-                        },
-                        {
-                          "type": "string"
-                        }
-                      ]
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -1938,7 +1928,6 @@
                     }
                   },
                   "required": [
-                    "description",
                     "id",
                     "question",
                     "isDeleted",
@@ -2785,16 +2774,6 @@
       "QuestionResponse": {
         "type": "object",
         "properties": {
-          "description": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "string"
-              }
-            ]
-          },
           "id": {
             "type": "string"
           },
@@ -2890,7 +2869,6 @@
           }
         },
         "required": [
-          "description",
           "id",
           "question",
           "isDeleted",
@@ -3069,9 +3047,6 @@
           "explanation": {
             "type": "string"
           },
-          "description": {
-            "type": "string"
-          },
           "year": {
             "type": "string"
           },
@@ -3136,9 +3111,6 @@
             }
           },
           "explanation": {
-            "type": "string"
-          },
-          "description": {
             "type": "string"
           },
           "correctAnswer": {

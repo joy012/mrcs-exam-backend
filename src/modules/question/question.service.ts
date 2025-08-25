@@ -161,7 +161,6 @@ export class QuestionService {
         intake: data.intake,
         categories: data.categories,
         explanation: data.explanation || '',
-        description: data.description || '',
         year: data.year,
         correctAnswer: data.correctAnswer,
         options: data.options,
@@ -226,9 +225,6 @@ export class QuestionService {
         ...(data.categories && { categories: data.categories }),
         ...(data.explanation !== undefined && {
           explanation: data.explanation,
-        }),
-        ...(data.description !== undefined && {
-          description: data.description,
         }),
         ...(data.correctAnswer && { correctAnswer: data.correctAnswer }),
         ...(data.options && { options: data.options }),

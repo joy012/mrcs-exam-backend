@@ -15,7 +15,6 @@ export interface CreateQuestionDto {
   intake: string;
   categories: string[];
   explanation?: string;
-  description?: string;
   year: string;
   correctAnswer: string;
   options: Record<string, string>;
@@ -29,7 +28,6 @@ export interface UpdateQuestionDto {
   intake?: string;
   categories?: string[];
   explanation?: string;
-  description?: string;
   correctAnswer?: string;
   options?: Record<string, string>;
   sourceFile?: string;
