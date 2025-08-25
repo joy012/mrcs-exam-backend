@@ -2104,6 +2104,417 @@
         ],
         "x-samchon-controller": "QuestionController"
       }
+    },
+    "/question-bank-practice": {
+      "get": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "required": false
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "intake",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": false
+          },
+          {
+            "name": "note",
+            "in": "query",
+            "schema": {
+              "oneOf": [
+                {
+                  "const": "all"
+                },
+                {
+                  "const": "with_note"
+                },
+                {
+                  "const": "without_note"
+                }
+              ]
+            },
+            "required": false
+          },
+          {
+            "name": "isCorrect",
+            "in": "query",
+            "schema": {
+              "oneOf": [
+                {
+                  "const": "all"
+                },
+                {
+                  "const": "correct"
+                },
+                {
+                  "const": "incorrect"
+                }
+              ]
+            },
+            "required": false
+          },
+          {
+            "name": "favorite",
+            "in": "query",
+            "schema": {
+              "oneOf": [
+                {
+                  "const": "all"
+                },
+                {
+                  "const": "favorite"
+                },
+                {
+                  "const": "not_favorite"
+                }
+              ]
+            },
+            "required": false
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionBankListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "getQuestionBank"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/filters": {
+      "get": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionBankFiltersResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "filters",
+          "getQuestionBankFilters"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/stats": {
+      "get": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionBankStatsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "stats",
+          "getQuestionBankStats"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/answer": {
+      "post": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionBankAnswerDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "isCorrect": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "isCorrect"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "answer",
+          "createQuestionBankAnswer"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/{questionId}/note": {
+      "put": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionBankNoteDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "note",
+          "updateQuestionBankNote"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/reset": {
+      "post": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetQuestionBankDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "resetCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "resetCount"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "reset",
+          "resetQuestionBank"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
+    },
+    "/question-bank-practice/toggle-favorite": {
+      "post": {
+        "tags": [
+          "Question Bank Practice"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleFavoriteDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "x-samchon-accessor": [
+          "question_bank_practice",
+          "toggle_favorite",
+          "toggleFavorite"
+        ],
+        "x-samchon-controller": "QuestionBankPracticeController"
+      }
     }
   },
   "components": {
@@ -3185,6 +3596,325 @@
           "sourceFiles",
           "lastUpdatedBy"
         ]
+      },
+      "QuestionBankListResponse": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionBankItemResponse"
+            }
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "questions",
+          "hasNext"
+        ]
+      },
+      "QuestionBankItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/Recordstringstring"
+          },
+          "correctAnswer": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "year": {
+            "type": "string"
+          },
+          "intake": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "displayName"
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "displayName",
+                "type"
+              ]
+            }
+          },
+          "userAnswer": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "isFavorite": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "options",
+          "correctAnswer",
+          "explanation",
+          "year",
+          "intake",
+          "categories",
+          "isFavorite",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "GetQuestionBankQueryDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "year": {
+            "type": "string"
+          },
+          "intake": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "oneOf": [
+              {
+                "const": "all"
+              },
+              {
+                "const": "with_note"
+              },
+              {
+                "const": "without_note"
+              }
+            ]
+          },
+          "isCorrect": {
+            "oneOf": [
+              {
+                "const": "all"
+              },
+              {
+                "const": "correct"
+              },
+              {
+                "const": "incorrect"
+              }
+            ]
+          },
+          "favorite": {
+            "oneOf": [
+              {
+                "const": "all"
+              },
+              {
+                "const": "favorite"
+              },
+              {
+                "const": "not_favorite"
+              }
+            ]
+          },
+          "search": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "QuestionBankFiltersResponse": {
+        "type": "object",
+        "properties": {
+          "intakes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "displayName"
+              ]
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "displayName": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "displayName",
+                "type"
+              ]
+            }
+          },
+          "years": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "intakes",
+          "categories",
+          "years"
+        ]
+      },
+      "QuestionBankStatsResponse": {
+        "type": "object",
+        "properties": {
+          "totalQuestions": {
+            "type": "number"
+          },
+          "answeredQuestions": {
+            "type": "number"
+          },
+          "correctAnswers": {
+            "type": "number"
+          },
+          "wrongAnswers": {
+            "type": "number"
+          },
+          "questionsWithNotes": {
+            "type": "number"
+          },
+          "accuracy": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalQuestions",
+          "answeredQuestions",
+          "correctAnswers",
+          "wrongAnswers",
+          "questionsWithNotes",
+          "accuracy"
+        ]
+      },
+      "CreateQuestionBankAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "userAnswer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "userAnswer"
+        ]
+      },
+      "UpdateQuestionBankNoteDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "note"
+        ]
+      },
+      "ResetQuestionBankDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "string"
+          },
+          "intake": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": []
+      },
+      "ToggleFavoriteDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId"
+        ]
       }
     },
     "securitySchemes": {
@@ -3210,6 +3940,9 @@
     },
     {
       "name": "Question"
+    },
+    {
+      "name": "Question Bank Practice"
     }
   ],
   "x-samchon-emended-v4": true

@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ExamIntakeModule } from './modules/examIntake/examIntake.module';
 import { QuestionModule } from './modules/question/question.module';
 import { QuestionCategoryModule } from './modules/questionCategory/questionCategory.module';
+import { QuestionBankPracticeModule } from './modules/questionBankPractice/questionBankPractice.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { UserModule } from './modules/user/user.module';
     ExamIntakeModule,
     QuestionCategoryModule,
     QuestionModule,
+    QuestionBankPracticeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

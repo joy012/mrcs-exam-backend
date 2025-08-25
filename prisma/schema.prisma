@@ -89,6 +89,25 @@ model Question {
   lastUpdatedBy          String?
 }
 
+/// Question Bank Practice tracks user's practice sessions and answers
+model QuestionBankPractice {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  questionId String   @db.ObjectId
+  userAnswer String?
+  note       String?
+  isCorrect  Boolean?
+  isFavorite Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@index([questionId])
+  @@index([userId, isCorrect])
+  @@index([userId, note])
+}
+
 /// Tracks authenticated user sessions. Only one active session per user is allowed at a time (enforced in service logic).
 model Session {
   id         String        @id @default(auto()) @map("_id") @db.ObjectId
