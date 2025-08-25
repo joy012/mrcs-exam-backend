@@ -253,7 +253,8 @@ export class QuestionBankPracticeService {
     const where: Record<string, any> = { isDeleted: false };
 
     if (params.year) where.year = params.year;
-    if (params.intake) where.intake = { $toObjectId: params.intake };
+    // Store intake for separate handling in aggregation pipeline
+    if (params.intake) where.intake = params.intake;
 
     // Store categories for separate handling in aggregation pipeline
     if (params.categories && params.categories.length > 0) {
@@ -310,6 +311,18 @@ export class QuestionBankPracticeService {
       // Match questions based on criteria
       { $match: mongoWhere },
     ];
+
+    // Add intake filter if specified
+    if (where.intake) {
+      const intakeFilter = {
+        $match: {
+          $expr: {
+            $eq: ['$intake', { $toObjectId: where.intake }],
+          },
+        },
+      };
+      questionsPipeline.push(intakeFilter);
+    }
 
     // Add categories filter if specified
     if (where.categories && where.categories.length > 0) {
@@ -452,6 +465,17 @@ export class QuestionBankPracticeService {
     // Build count pipeline for total count
     const countPipeline: any[] = [{ $match: mongoWhere }];
 
+    // Add intake filter to count pipeline as well
+    if (where.intake) {
+      countPipeline.push({
+        $match: {
+          $expr: {
+            $eq: ['$intake', { $toObjectId: where.intake }],
+          },
+        },
+      });
+    }
+
     // Add categories filter to count pipeline as well
     if (where.categories && where.categories.length > 0) {
       const categoryObjectIds = where.categories.map((categoryId) => ({
@@ -565,7 +589,8 @@ export class QuestionBankPracticeService {
 
     // Convert Prisma where clause to MongoDB format
     if (where.year) mongoWhere.year = where.year;
-    if (where.intake) mongoWhere.intake = { $toObjectId: where.intake };
+    // Note: Intake is handled separately in the aggregation pipeline
+    // Do not include intake in the initial $match stage
 
     // Note: Categories are handled separately in the aggregation pipeline using $setIntersection
     // Do not include categories in the initial $match stage
