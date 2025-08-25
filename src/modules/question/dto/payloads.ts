@@ -11,7 +11,7 @@ export interface GetAllQuestionsQueryDto {
 }
 
 export interface CreateQuestionDto {
-  mainQuestion: string;
+  question: string;
   intake: string;
   categories: string[];
   explanation?: string;
@@ -23,7 +23,7 @@ export interface CreateQuestionDto {
 }
 
 export interface UpdateQuestionDto {
-  mainQuestion?: string;
+  question?: string;
   year?: string;
   intake?: string;
   categories?: string[];

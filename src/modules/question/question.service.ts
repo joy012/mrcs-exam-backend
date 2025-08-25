@@ -55,7 +55,7 @@ export class QuestionService {
       where.isQuestionUpdateLocked = status === 'locked';
     }
     if (search) {
-      where.mainQuestion = { contains: search, mode: 'insensitive' };
+      where.question = { contains: search, mode: 'insensitive' };
     }
 
     // Execute count and data fetch in parallel
@@ -126,7 +126,7 @@ export class QuestionService {
   ): Promise<CreateQuestionResponse> {
     // check if question title already exists
     const existingQuestion = await this.prisma.question.findFirst({
-      where: { mainQuestion: data.mainQuestion },
+      where: { question: data.question },
     });
 
     if (existingQuestion) {
@@ -155,9 +155,7 @@ export class QuestionService {
 
     await this.prisma.question.create({
       data: {
-        mainQuestion: data.mainQuestion,
-        aiRephrasedQuestion: data.mainQuestion,
-        question: data.mainQuestion,
+        question: data.question,
         intake: data.intake,
         categories: data.categories,
         explanation: data.explanation || '',
@@ -216,9 +214,8 @@ export class QuestionService {
     await this.prisma.question.update({
       where: { id },
       data: {
-        ...(data.mainQuestion && {
-          mainQuestion: data.mainQuestion,
-          question: data.mainQuestion, // Update the original question field too
+        ...(data.question && {
+          question: data.question,
         }),
         ...(data.year && { year: data.year }),
         ...(data.intake && { intake: data.intake }),

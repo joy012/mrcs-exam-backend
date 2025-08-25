@@ -1872,19 +1872,6 @@
                         }
                       ]
                     },
-                    "aiRephrasedQuestion": {
-                      "oneOf": [
-                        {
-                          "type": "null"
-                        },
-                        {
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    "mainQuestion": {
-                      "type": "string"
-                    },
                     "intake": {
                       "type": "string"
                     },
@@ -1934,8 +1921,6 @@
                     "createdAt",
                     "updatedAt",
                     "options",
-                    "aiRephrasedQuestion",
-                    "mainQuestion",
                     "intake",
                     "categories",
                     "explanation",
@@ -2813,19 +2798,6 @@
               }
             ]
           },
-          "aiRephrasedQuestion": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "string"
-              }
-            ]
-          },
-          "mainQuestion": {
-            "type": "string"
-          },
           "explanation": {
             "type": "string"
           },
@@ -2875,8 +2847,6 @@
           "createdAt",
           "updatedAt",
           "options",
-          "aiRephrasedQuestion",
-          "mainQuestion",
           "explanation",
           "year",
           "correctAnswer",
@@ -3032,7 +3002,7 @@
       "CreateQuestionDto": {
         "type": "object",
         "properties": {
-          "mainQuestion": {
+          "question": {
             "type": "string"
           },
           "intake": {
@@ -3064,7 +3034,7 @@
           }
         },
         "required": [
-          "mainQuestion",
+          "question",
           "intake",
           "categories",
           "year",
@@ -3095,7 +3065,7 @@
       "UpdateQuestionDto": {
         "type": "object",
         "properties": {
-          "mainQuestion": {
+          "question": {
             "type": "string"
           },
           "year": {

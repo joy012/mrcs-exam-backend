@@ -75,8 +75,6 @@ model QuestionCategory {
 model Question {
   id                     String   @id @default(auto()) @map("_id") @db.ObjectId
   question               String
-  aiRephrasedQuestion    String?
-  mainQuestion           String
   intake                 String   @db.ObjectId
   categories             String[] @db.ObjectId
   explanation            String
