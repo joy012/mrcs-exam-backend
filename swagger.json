@@ -3638,13 +3638,21 @@
               "$ref": "#/components/schemas/QuestionBankItemResponse"
             }
           },
-          "hasNext": {
-            "type": "boolean"
+          "totalCount": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "currentPage": {
+            "type": "number"
           }
         },
         "required": [
           "questions",
-          "hasNext"
+          "totalCount",
+          "totalPages",
+          "currentPage"
         ]
       },
       "QuestionBankItemResponse": {
