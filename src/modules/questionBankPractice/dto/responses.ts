@@ -24,7 +24,9 @@ export interface QuestionBankItemResponse {
 
 export interface QuestionBankListResponse {
   questions: QuestionBankItemResponse[];
-  hasNext: boolean;
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
 }
 
 export interface QuestionBankStatsResponse {

@@ -57,12 +57,7 @@ export class QuestionBankPracticeService {
         favorite,
       );
 
-    const { questions, hasNext } = this.processAggregationPagination(
-      questionsWithPractice.questions,
-      limit,
-      questionsWithPractice.totalCount,
-      page,
-    );
+    const { questions, totalCount } = questionsWithPractice;
 
     // Convert BSON date objects (e.g. { $date: "2025-08-25T...Z" }) to native JS Date instances
     const sanitizedQuestions = questions.map(
@@ -71,7 +66,9 @@ export class QuestionBankPracticeService {
 
     return {
       questions: sanitizedQuestions,
-      hasNext,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
     };
   }
 
@@ -562,7 +559,7 @@ export class QuestionBankPracticeService {
         pipeline: [
           ...questionsPipeline,
           { $skip: (page - 1) * limit },
-          { $limit: limit + 1 },
+          { $limit: limit },
         ],
       }),
       this.prisma.question.aggregateRaw({
@@ -637,18 +634,6 @@ export class QuestionBankPracticeService {
     }
 
     return filters;
-  }
-
-  private processAggregationPagination(
-    questions: any[],
-    limit: number,
-    totalCount: number,
-    page: number,
-  ): { questions: any[]; hasNext: boolean } {
-    const hasNext = questions.length > limit;
-    const questionsToReturn = hasNext ? questions.slice(0, limit) : questions;
-
-    return { questions: questionsToReturn, hasNext };
   }
 
   private async validateQuestionExists(questionId: string): Promise<Question> {
