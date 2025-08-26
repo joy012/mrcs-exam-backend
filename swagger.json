@@ -3888,7 +3888,7 @@
           "questionsWithNotes": {
             "type": "number"
           },
-          "accuracy": {
+          "favoriteQuestions": {
             "type": "number"
           }
         },
@@ -3898,7 +3898,7 @@
           "correctAnswers",
           "wrongAnswers",
           "questionsWithNotes",
-          "accuracy"
+          "favoriteQuestions"
         ]
       },
       "CreateQuestionBankAnswerDto": {

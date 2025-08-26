@@ -149,6 +149,7 @@ export class QuestionBankPracticeService {
       correctAnswers,
       wrongAnswers,
       questionsWithNotes,
+      favoriteQuestions,
     ] = await Promise.all([
       this.prisma.question.count({ where: { isDeleted: false } }),
       this.prisma.questionBankPractice.count({
@@ -175,9 +176,13 @@ export class QuestionBankPracticeService {
           AND: [{ note: { not: null } }, { note: { not: '' } }],
         },
       }),
+      this.prisma.questionBankPractice.count({
+        where: {
+          userId,
+          isFavorite: true,
+        },
+      }),
     ]);
-
-    const accuracy = this.calculateAccuracy(answeredQuestions, correctAnswers);
 
     return {
       totalQuestions,
@@ -185,7 +190,7 @@ export class QuestionBankPracticeService {
       correctAnswers,
       wrongAnswers,
       questionsWithNotes,
-      accuracy,
+      favoriteQuestions,
     };
   }
 

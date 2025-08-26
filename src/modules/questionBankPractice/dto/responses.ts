@@ -35,7 +35,7 @@ export interface QuestionBankStatsResponse {
   correctAnswers: number;
   wrongAnswers: number;
   questionsWithNotes: number;
-  accuracy: number;
+  favoriteQuestions: number;
 }
 
 export interface QuestionBankFiltersResponse {
