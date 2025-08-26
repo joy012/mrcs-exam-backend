@@ -66,4 +66,10 @@ export class UserController {
   ) {
     return this.userService.uploadAvatar(avatar, userId);
   }
+
+  @Post('upload/media')
+  @ApiImageFile({ fieldName: 'media' })
+  uploadMedia(@UploadedFile() media: Express.Multer.File) {
+    return this.userService.uploadMedia(media);
+  }
 }

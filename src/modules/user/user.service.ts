@@ -186,4 +186,20 @@ export class UserService {
 
     return this.mapUserToResponse(updatedUser);
   }
+
+  async uploadMedia(media: Express.Multer.File): Promise<string> {
+    const mediaFilename = `${media.filename}-${Date.now()}.webp`;
+    const sharpBuffer = await sharp(media.buffer)
+      .resize(200)
+      .webp({ nearLossless: true, quality: 90 })
+      .toBuffer();
+
+    const uploadedURL = await this.storageService.upload(
+      'images/media',
+      mediaFilename,
+      sharpBuffer,
+    );
+
+    return uploadedURL;
+  }
 }
