@@ -151,7 +151,7 @@ export class QuestionBankPracticeService {
       questionsWithNotes,
       favoriteQuestions,
     ] = await Promise.all([
-      this.prisma.question.count({ where: { isDeleted: false } }),
+      this.prisma.question.count(),
       this.prisma.questionBankPractice.count({
         where: {
           userId,
@@ -226,7 +226,6 @@ export class QuestionBankPracticeService {
       }),
       // Get unique years from questions
       this.prisma.question.findMany({
-        where: { isDeleted: false },
         select: { year: true },
         distinct: ['year'],
         orderBy: { year: 'desc' },
@@ -252,7 +251,7 @@ export class QuestionBankPracticeService {
     categories?: string[];
     search?: string;
   }) {
-    const where: Record<string, any> = { isDeleted: false };
+    const where: Record<string, any> = {};
 
     if (params.year) where.year = params.year;
     // Store intake for separate handling in aggregation pipeline
@@ -279,7 +278,7 @@ export class QuestionBankPracticeService {
     categories?: string[];
     search?: string;
   }) {
-    const where: Record<string, any> = { isDeleted: false };
+    const where: Record<string, any> = {};
 
     if (params.year) where.year = params.year;
     if (params.intake) where.intake = params.intake;
@@ -587,7 +586,7 @@ export class QuestionBankPracticeService {
   private convertPrismaWhereToMongo(
     where: Record<string, any>,
   ): Record<string, any> {
-    const mongoWhere: Record<string, any> = { isDeleted: false };
+    const mongoWhere: Record<string, any> = {};
 
     // Convert Prisma where clause to MongoDB format
     if (where.year) mongoWhere.year = where.year;
@@ -643,7 +642,7 @@ export class QuestionBankPracticeService {
 
   private async validateQuestionExists(questionId: string): Promise<Question> {
     const question = await this.prisma.question.findUnique({
-      where: { id: questionId, isDeleted: false },
+      where: { id: questionId },
     });
 
     if (!question) {

@@ -1871,9 +1871,6 @@
                     "question": {
                       "type": "string"
                     },
-                    "isDeleted": {
-                      "type": "boolean"
-                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -1949,7 +1946,6 @@
                   "required": [
                     "id",
                     "question",
-                    "isDeleted",
                     "createdAt",
                     "updatedAt",
                     "options",
@@ -3208,9 +3204,6 @@
           "question": {
             "type": "string"
           },
-          "isDeleted": {
-            "type": "boolean"
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3286,7 +3279,6 @@
         "required": [
           "id",
           "question",
-          "isDeleted",
           "createdAt",
           "updatedAt",
           "options",

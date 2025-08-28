@@ -40,9 +40,7 @@ export class QuestionService {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      isDeleted: false,
-    };
+    const where: any = {};
 
     if (year) where.year = year;
     if (intake) where.intake = intake;
@@ -177,7 +175,7 @@ export class QuestionService {
   ): Promise<UpdateQuestionResponse> {
     // Check if question exists and is not locked
     const existingQuestion = await this.prisma.question.findUnique({
-      where: { id, isDeleted: false },
+      where: { id },
     });
 
     if (!existingQuestion) {
@@ -238,17 +236,25 @@ export class QuestionService {
 
   async deleteQuestion(id: string): Promise<DeleteQuestionResponse> {
     const question = await this.prisma.question.findUnique({
-      where: { id, isDeleted: false },
+      where: { id },
     });
 
     if (!question) {
       throw new NotFoundException('Question not found');
     }
 
-    // Soft delete by setting isDeleted flag
-    await this.prisma.question.update({
-      where: { id },
-      data: { isDeleted: true },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.question.delete({
+        where: {
+          id,
+        },
+      });
+
+      await tx.questionBankPractice.deleteMany({
+        where: {
+          questionId: id,
+        },
+      });
     });
 
     return { message: 'Question deleted successfully' };
@@ -259,7 +265,7 @@ export class QuestionService {
     updatedBy: string,
   ): Promise<LockQuestionResponse> {
     const question = await this.prisma.question.findUnique({
-      where: { id, isDeleted: false },
+      where: { id },
     });
 
     if (!question) {
@@ -296,7 +302,6 @@ export class QuestionService {
       }),
       // Get unique years, source files, and lastUpdatedBy from questions
       this.prisma.question.findMany({
-        where: { isDeleted: false },
         select: { year: true, sourceFile: true, lastUpdatedBy: true },
       }),
     ]);
@@ -335,7 +340,7 @@ export class QuestionService {
 
   async getQuestionById(id: string): Promise<Question> {
     const question = await this.prisma.question.findUnique({
-      where: { id, isDeleted: false },
+      where: { id },
     });
 
     if (!question) {
