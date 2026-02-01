@@ -222,12 +222,20 @@ export class AuthService {
     sessionInfo: SessionInfoDto,
     ipAddress?: string,
   ): Promise<CreateSessionResponse> {
-    // Check if user already has an active session
-    const activeSession = await this.checkActiveSession(userId);
-    if (activeSession) {
-      throw new BadRequestException(
-        `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
-      );
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    const isAdmin = user?.role === UserRole.admin;
+
+    // Students: only one active session; admins: allow multiple sessions
+    if (!isAdmin) {
+      const activeSession = await this.checkActiveSession(userId);
+      if (activeSession) {
+        throw new BadRequestException(
+          `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+        );
+      }
     }
 
     const session = await this.createSession(userId, sessionInfo, ipAddress);
@@ -370,17 +378,20 @@ export class AuthService {
 
     // Handle session management if session info provided
     if (payload.session) {
-      // Check for active session on other devices
-      const activeSession = await this.checkActiveSession(
-        user.id,
-        'ACTIVE',
-        payload.session.deviceName,
-        payload.session.userAgent,
-      );
-      if (activeSession) {
-        throw new BadRequestException(
-          `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+      // Admins: allow multiple sessions; students: only one active session per user
+      const isAdmin = user.role === UserRole.admin;
+      if (!isAdmin) {
+        const activeSession = await this.checkActiveSession(
+          user.id,
+          'ACTIVE',
+          payload.session.deviceName,
+          payload.session.userAgent,
         );
+        if (activeSession) {
+          throw new BadRequestException(
+            `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+          );
+        }
       }
 
       // Create or update session for this device
@@ -439,17 +450,20 @@ export class AuthService {
 
     // Handle session management if session info provided
     if (payload.session) {
-      // Check for active session on other devices
-      const activeSession = await this.checkActiveSession(
-        user.id,
-        'ACTIVE',
-        payload.session.deviceName,
-        payload.session.userAgent,
-      );
-      if (activeSession) {
-        throw new BadRequestException(
-          `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+      // Admins: allow multiple sessions; students: only one active session per user
+      const isAdmin = user.role === UserRole.admin;
+      if (!isAdmin) {
+        const activeSession = await this.checkActiveSession(
+          user.id,
+          'ACTIVE',
+          payload.session.deviceName,
+          payload.session.userAgent,
         );
+        if (activeSession) {
+          throw new BadRequestException(
+            `You are already logged in on ${activeSession.deviceName}. Please logout from that device to continue here.`,
+          );
+        }
       }
 
       // Create session for this device
