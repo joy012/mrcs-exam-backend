@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "pnpm run gen:prisma && nest build",
     "build:email": "pnpm dlx react-email export --dir src/libs/email/react/templates --outDir dist/emails",
     "build:all": "pnpm run build:email && pnpm run build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

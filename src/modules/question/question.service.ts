@@ -307,10 +307,10 @@ export class QuestionService {
     ]);
 
     // Extract unique years, source files, and lastUpdatedBy
-    const uniqueYears = [
+    const uniqueYears: string[] = [
       ...new Set(yearsAndSourceFiles.map((q) => q.year)),
     ].sort();
-    const uniqueSourceFiles = [
+    const uniqueSourceFiles: string[] = [
       ...new Set(
         yearsAndSourceFiles
           .map((q) => q.sourceFile)
@@ -319,7 +319,7 @@ export class QuestionService {
           ),
       ),
     ].sort();
-    const uniqueLastUpdatedBy = [
+    const uniqueLastUpdatedBy: string[] = [
       ...new Set(
         yearsAndSourceFiles
           .map((q) => q.lastUpdatedBy)

@@ -4,8 +4,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QuestionCategoryType } from '@prisma/client';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
-import { QuestionCategoryService } from './questionCategory.service';
 import { CreateQuestionCategoryDto, UpdateQuestionCategoryDto } from './dto';
+import { QuestionCategoryService } from './questionCategory.service';
 
 @UseGuards(JwtAuthGuard, RoleGuard('admin'))
 @ApiTags('Question Category')
