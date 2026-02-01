@@ -1,4 +1,4 @@
-import { UserResponse } from 'src/modules/user/dto';
+import { UserResponse } from '../../user/dto';
 import { tags } from 'typia';
 
 export interface SessionResponse {

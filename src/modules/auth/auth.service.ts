@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { SessionStatus, User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { CustomJwtService } from 'src/libs/jwt/jwt.service';
+import { CustomJwtService } from '../../libs/jwt/jwt.service';
 import { ConfigService } from '../../libs/config/config.service';
 import { EmailService } from '../../libs/email/email.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';

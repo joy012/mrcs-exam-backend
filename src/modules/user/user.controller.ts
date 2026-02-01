@@ -1,8 +1,8 @@
 import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
 import { Controller, Post, UploadedFile, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiImageFile } from 'src/common/decorators/api-file.decorator';
-import { UserId } from 'src/common/decorators/user.decorators';
+import { ApiImageFile } from '../../common/decorators/api-file.decorator';
+import { UserId } from '../../common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { CreateUserDto, UpdateUserDto } from './dto';

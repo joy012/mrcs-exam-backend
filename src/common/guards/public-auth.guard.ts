@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from 'src/libs/config/config.service';
+import { ConfigService } from '../../libs/config/config.service';
 
 @Injectable()
 export class AppPublicAuthGuard implements CanActivate {

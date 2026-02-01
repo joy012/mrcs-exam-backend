@@ -1,7 +1,7 @@
 import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
 import { Controller, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserId } from 'src/common/decorators/user.decorators';
+import { UserId } from '../../common/decorators/user.decorators';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { RoleGuard } from '../../common/guards/role.guard';
 import {
