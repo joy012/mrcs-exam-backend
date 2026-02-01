@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { ConfigService } from '../../libs/config/config.service';
 import { PrismaService } from '../../libs/prisma/prisma.service';
 import { StorageService } from '../../libs/storage/storage.service';
